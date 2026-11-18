@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clicker Mini App v1.4</title>
+    <title>Clicker Mini App v1.6</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -59,9 +59,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             position: relative;
-            padding: 20px;
+            padding: 15px;
+            overflow-y: auto;
         }
 
         /* Вкладки */
@@ -69,10 +70,8 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             width: 100%;
-            height: 100%;
-            text-align: center;
+            gap: 12px;
         }
 
         .tab-screen.active {
@@ -80,6 +79,14 @@
         }
 
         /* Счётчик тапов */
+        .clicker-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
         .score-label {
             font-size: 16px;
             text-transform: uppercase;
@@ -133,11 +140,11 @@
             100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
         }
 
-        /* Карточки для вкладок Прокачка и Новости */
+        /* Карточки в магазине */
         .card-box {
             background: rgba(0, 0, 0, 0.35);
             backdrop-filter: blur(10px);
-            padding: 25px 20px;
+            padding: 18px;
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             max-width: 340px;
@@ -146,28 +153,29 @@
         }
 
         .card-box h2 {
-            font-size: 24px;
-            margin-bottom: 15px;
+            font-size: 20px;
+            margin-bottom: 10px;
         }
 
-        /* Кнопка улучшения в магазине */
         .upgrade-card {
             background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
+            padding: 12px;
             border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
+            margin-bottom: 10px;
+            text-align: left;
         }
 
         .upgrade-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
         }
 
         .upgrade-desc {
-            font-size: 13px;
+            font-size: 11px;
             opacity: 0.8;
         }
 
@@ -175,12 +183,14 @@
             background: #ffd166;
             color: #000;
             border: none;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 9px;
+            border-radius: 10px;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 13px;
             cursor: pointer;
             transition: 0.2s;
+            text-align: center;
+            width: 100%;
         }
 
         .upgrade-btn:active {
@@ -308,7 +318,7 @@
         </div>
         <div class="energy-info">
             <span>⚡</span>
-            <span id="displayEnergy">5000</span> / 5000
+            <span id="displayEnergy">5000</span> / <span id="displayMaxEnergy">5000</span>
         </div>
     </div>
 
@@ -318,17 +328,33 @@
         <!-- Вкладка 1: Прокачка -->
         <div class="tab-screen" id="tab-upgrade">
             <div class="card-box">
-                <h2>⬆️ Прокачка силы</h2>
+                <h2>⬆️ Магазин улучшений</h2>
+                
+                <!-- 1. Прокачка силы тапа -->
                 <div class="upgrade-card">
-                    <div class="upgrade-title" id="upgradeTitle">Сила тапа: +1</div>
-                    <div class="upgrade-desc" id="upgradeDesc">Увеличить силу тапа до +2</div>
-                    <button class="upgrade-btn" id="upgradeBtn" onclick="buyUpgrade()">Купить за 100 🪙</button>
+                    <div class="upgrade-title" id="tapTitle">Сила тапа: +1</div>
+                    <div class="upgrade-desc" id="tapDesc">Увеличить силу тапа</div>
+                    <button class="upgrade-btn" id="tapUpgradeBtn" onclick="buyTapUpgrade()">Купить</button>
+                </div>
+
+                <!-- 2. Прокачка объема энергии -->
+                <div class="upgrade-card">
+                    <div class="upgrade-title" id="energyCapTitle">Емкость: 5 000</div>
+                    <div class="upgrade-desc" id="energyCapDesc">Увеличить макс. энергию</div>
+                    <button class="upgrade-btn" id="energyCapBtn" onclick="buyEnergyCapUpgrade()">Купить</button>
+                </div>
+
+                <!-- 3. Прокачка прибавления энергии в секунду -->
+                <div class="upgrade-card">
+                    <div class="upgrade-title" id="regenTitle">Приток: +1/сек</div>
+                    <div class="upgrade-desc" id="regenDesc">Ускорить прибавление энергии</div>
+                    <button class="upgrade-btn" id="regenBtn" onclick="buyRegenUpgrade()">Купить</button>
                 </div>
             </div>
         </div>
 
         <!-- Вкладка 2: Кликер (Главная) -->
-        <div class="tab-screen active" id="tab-clicker">
+        <div class="tab-screen active clicker-container" id="tab-clicker">
             <div class="score-label">Количество тапов</div>
             <div class="score-value" id="displayScore">0</div>
             
@@ -341,7 +367,7 @@
         <div class="tab-screen" id="tab-news">
             <div class="card-box">
                 <h2>📢 Новости</h2>
-                <p><b>Версия 1.4 (Максимальная прокачка)</b><br>Добавлен лимит улучшений силы тапа до +10!</p>
+                <p><b>Версия 1.6 (Новый баланс)</b><br>Обновлены точные цены и уровни для энергии и притока в секунду!</p>
             </div>
         </div>
 
@@ -367,25 +393,28 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const MAX_ENERGY = 5000;
         let score = parseInt(localStorage.getItem('clicker_score')) || 0;
-        let energy = localStorage.getItem('clicker_energy') !== null ? parseInt(localStorage.getItem('clicker_energy')) : MAX_ENERGY;
         let username = localStorage.getItem('clicker_username') || '';
         
         let tapPower = parseInt(localStorage.getItem('clicker_tapPower')) || 1;
-        let tapLevel = parseInt(localStorage.getItem('clicker_tapLevel')) || 0; 
+        let tapLevel = parseInt(localStorage.getItem('clicker_tapLevel')) || 0;
 
-        // Восстановление энергии в офлайне
-        const ENERGY_COOLDOWN = 1000;
+        let maxEnergy = parseInt(localStorage.getItem('clicker_maxEnergy')) || 5000;
+        let energyCapLevel = parseInt(localStorage.getItem('clicker_energyCapLevel')) || 0;
+
+        let regenRate = parseInt(localStorage.getItem('clicker_regenRate')) || 1;
+        let regenLevel = parseInt(localStorage.getItem('clicker_regenLevel')) || 0;
+
+        let energy = localStorage.getItem('clicker_energy') !== null ? parseInt(localStorage.getItem('clicker_energy')) : maxEnergy;
+
+        // Офлайн восстановление
         let lastSavedTime = localStorage.getItem('lastExitTime');
-
         if (lastSavedTime) {
             let elapsedMs = Date.now() - Number(lastSavedTime);
             let elapsedSeconds = Math.floor(elapsedMs / 1000);
-            let restoredEnergy = Math.floor(elapsedSeconds * (1000 / ENERGY_COOLDOWN));
-            
+            let restoredEnergy = Math.floor(elapsedSeconds * regenRate);
             if (restoredEnergy > 0) {
-                energy = Math.min(MAX_ENERGY, energy + restoredEnergy);
+                energy = Math.min(maxEnergy, energy + restoredEnergy);
             }
         }
 
@@ -401,12 +430,22 @@
 
         const displayScore = document.getElementById('displayScore');
         const displayEnergy = document.getElementById('displayEnergy');
+        const displayMaxEnergy = document.getElementById('displayMaxEnergy');
         const displayUsername = document.getElementById('displayUsername');
         const regModal = document.getElementById('regModal');
         const clickBtn = document.getElementById('clickBtn');
-        const upgradeTitle = document.getElementById('upgradeTitle');
-        const upgradeDesc = document.getElementById('upgradeDesc');
-        const upgradeBtn = document.getElementById('upgradeBtn');
+
+        const tapTitle = document.getElementById('tapTitle');
+        const tapDesc = document.getElementById('tapDesc');
+        const tapUpgradeBtn = document.getElementById('tapUpgradeBtn');
+
+        const energyCapTitle = document.getElementById('energyCapTitle');
+        const energyCapDesc = document.getElementById('energyCapDesc');
+        const energyCapBtn = document.getElementById('energyCapBtn');
+
+        const regenTitle = document.getElementById('regenTitle');
+        const regenDesc = document.getElementById('regenDesc');
+        const regenBtn = document.getElementById('regenBtn');
 
         if (!username) {
             regModal.style.display = 'flex';
@@ -429,54 +468,122 @@
         function saveGameData() {
             localStorage.setItem('clicker_score', score);
             localStorage.setItem('clicker_energy', energy);
+            localStorage.setItem('clicker_maxEnergy', maxEnergy);
             localStorage.setItem('clicker_tapPower', tapPower);
             localStorage.setItem('clicker_tapLevel', tapLevel);
+            localStorage.setItem('clicker_energyCapLevel', energyCapLevel);
+            localStorage.setItem('clicker_regenRate', regenRate);
+            localStorage.setItem('clicker_regenLevel', regenLevel);
         }
 
-        // Обновление интерфейса магазина с лимитом
+        // Обновление интерфейса по твоим точным правилам
         function updateUI() {
             displayScore.textContent = score.toLocaleString('ru-RU');
             displayEnergy.textContent = energy;
+            displayMaxEnergy.textContent = maxEnergy;
             saveGameData();
 
+            // 1. Сила тапа
             if (tapLevel === 0) {
-                upgradeTitle.textContent = "Сила тапа: +1";
-                upgradeDesc.textContent = "Увеличить силу тапа до +2";
-                upgradeBtn.textContent = "Купить за 100 🪙";
-                upgradeBtn.disabled = score < 100;
+                tapTitle.textContent = "Сила тапа: +1";
+                tapDesc.textContent = "Цена: 100 🪙 (Даёт +2)";
+                tapUpgradeBtn.textContent = "Купить за 100";
+                tapUpgradeBtn.disabled = score < 100;
             } else if (tapLevel === 1) {
-                upgradeTitle.textContent = "Сила тапа: +2";
-                upgradeDesc.textContent = "Увеличить силу тапа до +5";
-                upgradeBtn.textContent = "Купить за 1 000 🪙";
-                upgradeBtn.disabled = score < 1000;
+                tapTitle.textContent = "Сила тапа: +2";
+                tapDesc.textContent = "Цена: 1 000 🪙 (Даёт +5)";
+                tapUpgradeBtn.textContent = "Купить за 1 000";
+                tapUpgradeBtn.disabled = score < 1000;
             } else if (tapLevel === 2) {
-                upgradeTitle.textContent = "Сила тапа: +5";
-                upgradeDesc.textContent = "Увеличить силу тапа до +10 (Максимум)";
-                upgradeBtn.textContent = "Купить за 5 000 🪙";
-                upgradeBtn.disabled = score < 5000;
+                tapTitle.textContent = "Сила тапа: +5";
+                tapDesc.textContent = "Цена: 5 000 🪙 (Даёт +10)";
+                tapUpgradeBtn.textContent = "Купить за 5 000";
+                tapUpgradeBtn.disabled = score < 5000;
             } else {
-                upgradeTitle.textContent = "Сила тапа: +10 (МАКСИМУМ)";
-                upgradeDesc.textContent = "Достигнут предел прокачки силы!";
-                upgradeBtn.textContent = "Успех 🎉";
-                upgradeBtn.disabled = true;
+                tapTitle.textContent = "Сила тапа: +10 (МАКС)";
+                tapDesc.textContent = "Предел силы достигнут";
+                tapUpgradeBtn.textContent = "Максимум 🎉";
+                tapUpgradeBtn.disabled = true;
+            }
+
+            // 2. Емкость энергии по твоим ценам и объемам
+            if (energyCapLevel === 0) {
+                energyCapTitle.textContent = "Емкость: 5 000 ➔ 10 000";
+                energyCapDesc.textContent = "Цена: 1 000 🪙";
+                energyCapBtn.textContent = "Купить за 1 000";
+                energyCapBtn.disabled = score < 1000;
+            } else if (energyCapLevel === 1) {
+                energyCapTitle.textContent = "Емкость: 10 000 ➔ 25 000";
+                energyCapDesc.textContent = "Цена: 5 000 🪙";
+                energyCapBtn.textContent = "Купить за 5 000";
+                energyCapBtn.disabled = score < 5000;
+            } else if (energyCapLevel === 2) {
+                energyCapTitle.textContent = "Емкость: 25 000 ➔ 50 000";
+                energyCapDesc.textContent = "Цена: 10 000 🪙";
+                energyCapBtn.textContent = "Купить за 10 000";
+                energyCapBtn.disabled = score < 10000;
+            } else {
+                energyCapTitle.textContent = "Емкость: 50 000 (МАКС)";
+                energyCapDesc.textContent = "Максимальный запас батареи";
+                energyCapBtn.textContent = "Максимум 🎉";
+                energyCapBtn.disabled = true;
+            }
+
+            // 3. Приток энергии в секунду по твоим шагам
+            if (regenLevel === 0) {
+                regenTitle.textContent = "Приток: +1 ➔ +2 /сек";
+                regenDesc.textContent = "Цена: 500 🪙";
+                regenBtn.textContent = "Купить за 500";
+                regenBtn.disabled = score < 500;
+            } else if (regenLevel === 1) {
+                regenTitle.textContent = "Приток: +2 ➔ +3 /сек";
+                regenDesc.textContent = "Цена: 2 000 🪙";
+                regenBtn.textContent = "Купить за 2 000";
+                regenBtn.disabled = score < 2000;
+            } else if (regenLevel === 2) {
+                regenTitle.textContent = "Приток: +3 ➔ +4 /сек";
+                regenDesc.textContent = "Цена: 5 000 🪙";
+                regenBtn.textContent = "Купить за 5 000";
+                regenBtn.disabled = score < 5000;
+            } else if (regenLevel === 3) {
+                regenTitle.textContent = "Приток: +4 ➔ +5 /сек";
+                regenDesc.textContent = "Цена: 10 000 🪙";
+                regenBtn.textContent = "Купить за 10 000";
+                regenBtn.disabled = score < 10000;
+            } else {
+                regenTitle.textContent = "Приток: +5 /сек (МАКС)";
+                regenDesc.textContent = "Максимальная скорость притока";
+                regenBtn.textContent = "Максимум 🎉";
+                regenBtn.disabled = true;
             }
         }
 
-        // Последовательная покупка с ограничением уровня
-        function buyUpgrade() {
-            if (tapLevel === 0 && score >= 100) {
-                score -= 100;
-                tapPower = 2;
-                tapLevel = 1;
-            } else if (tapLevel === 1 && score >= 1000) {
-                score -= 1000;
-                tapPower = 5;
-                tapLevel = 2;
-            } else if (tapLevel === 2 && score >= 5000) {
-                score -= 5000;
-                tapPower = 10;
-                tapLevel = 3; // Максимальный уровень
+        // Покупка силы
+        function buyTapUpgrade() {
+            if (tapLevel === 0 && score >= 100) { score -= 100; tapPower = 2; tapLevel = 1; }
+            else if (tapLevel === 1 && score >= 1000) { score -= 1000; tapPower = 5; tapLevel = 2; }
+            else if (tapLevel === 2 && score >= 5000) { score -= 5000; tapPower = 10; tapLevel = 3; }
+            updateUI();
+        }
+
+        // Покупка емкости по новой сетке
+        function buyEnergyCapUpgrade() {
+            if (energyCapLevel === 0 && score >= 1000) {
+                score -= 1000; maxEnergy = 10000; energyCapLevel = 1; energy = Math.min(energy, maxEnergy);
+            } else if (energyCapLevel === 1 && score >= 5000) {
+                score -= 5000; maxEnergy = 25000; energyCapLevel = 2; energy = Math.min(energy, maxEnergy);
+            } else if (energyCapLevel === 2 && score >= 10000) {
+                score -= 10000; maxEnergy = 50000; energyCapLevel = 3; energy = Math.min(energy, maxEnergy);
             }
+            updateUI();
+        }
+
+        // Покупка притока по новой сетке
+        function buyRegenUpgrade() {
+            if (regenLevel === 0 && score >= 500) { score -= 500; regenRate = 2; regenLevel = 1; }
+            else if (regenLevel === 1 && score >= 2000) { score -= 2000; regenRate = 3; regenLevel = 2; }
+            else if (regenLevel === 2 && score >= 5000) { score -= 5000; regenRate = 4; regenLevel = 3; }
+            else if (regenLevel === 3 && score >= 10000) { score -= 10000; regenRate = 5; regenLevel = 4; }
             updateUI();
         }
 
@@ -507,9 +614,10 @@
             }, 800);
         }
 
+        // Авто-приток энергии каждую секунду
         setInterval(() => {
-            if (energy < MAX_ENERGY) {
-                energy += 1;
+            if (energy < maxEnergy) {
+                energy = Math.min(maxEnergy, energy + regenRate);
                 updateUI();
             }
         }, 1000);
