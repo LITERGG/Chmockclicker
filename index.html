@@ -405,7 +405,7 @@
                 energy += 1;
                 updateUI();
             }
-        }, 2000);
+        }, 1000);
 
         // Переключение вкладок нижнего меню
         function switchTab(tabName, btnElement) {
@@ -418,6 +418,28 @@
 
         // Первичный запуск отображения
         updateUI();
+        // --- ОФЛАЙН-ВОССТАНОВЛЕНИЕ ЭНЕРГИИ ---
+const ENERGY_COOLDOWN = 1000; // 1 секунда на 1 энергию
+let lastSavedTime = localStorage.getItem('lastExitTime');
+
+if (lastSavedTime) {
+    let elapsedMs = Date.now() - Number(lastSavedTime);
+    let elapsedSeconds = Math.floor(elapsedMs / 1000);
+    let restoredEnergy = Math.floor(elapsedSeconds * (1000 / ENERGY_COOLDOWN));
+    
+    if (restoredEnergy > 0) {
+        energy = Math.min(MAX_ENERGY, energy + restoredEnergy);
+    }
+}
+
+window.addEventListener('beforeunload', () => {
+    localStorage.setItem('lastExitTime', Date.now());
+});
+
+setInterval(() => {
+    localStorage.setItem('lastExitTime', Date.now());
+}, 5000);
+
     </script>
 </body>
 </html>
