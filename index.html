@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -443,7 +443,7 @@
     </div>
 
     <!-- Вкладка 2: Прокачки -->
-    <div class="tab-content" id="tab-upgrades" id="upgradesList"></div>
+    <div class="tab-content" id="tab-upgrades"></div>
 
     <!-- Вкладка 3: Ежедневный бонус -->
     <div class="tab-content" id="tab-daily">
@@ -465,10 +465,7 @@
           <div class="card-desc">За каждого друга — бонус <strong>+250 🐟</strong> и доля от его успехов</div>
         </div>
         <div class="ref-box" id="refLinkBox"></div>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn btn-primary" style="flex: 1;" id="copyRefBtn">Скопировать ссылку</button>
-          <button class="btn btn-secondary" id="simRefBtn">+1 друг (тест)</button>
-        </div>
+        <button class="btn btn-primary" id="copyRefBtn">Скопировать ссылку</button>
       </div>
 
       <div class="card">
@@ -689,7 +686,6 @@
 
     function renderUpgrades() {
       const container = document.getElementById("tab-upgrades");
-      const { perTap } = getStats();
       container.innerHTML = "";
 
       for (const def of UPGRADE_DEFS) {
@@ -847,17 +843,6 @@
       } catch {
         showToast("Скопируйте ссылку из поля выше");
       }
-    });
-
-    document.getElementById("simRefBtn").addEventListener("click", () => {
-      const bonus = 250;
-      state.referrals += 1;
-      state.refBonusTotal += bonus;
-      state.balance += bonus;
-      haptic("medium");
-      showToast(`Друг присоединился! +${bonus} 🐟`);
-      saveState();
-      renderAll();
     });
 
     document.querySelectorAll(".nav-btn").forEach((btn) => {
