@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clicker Mini App</title>
+    <title>Telegram Clicker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -16,7 +16,7 @@
         }
 
         body {
-            background: radial-gradient(circle at 50% 30%, #ff6b2b 0%, #d93800 60%, #8f1d00 100%);
+            background: radial-gradient(circle at 50% 25%, #ff6b2b 0%, #c83200 62%, #7d1700 100%);
             color: #ffffff;
             height: 100vh;
             display: flex;
@@ -25,514 +25,471 @@
             overflow: hidden;
         }
 
-        .header {
+        .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 18px;
-            background: rgba(0, 0, 0, 0.25);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            font-size: 15px;
-            font-weight: 600;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.28);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+            font-size: 14px;
+            font-weight: 700;
         }
 
-        .player-info {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .energy-info {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(255, 255, 255, 0.15);
+        .balance-pill {
+            background: rgba(255, 209, 102, 0.2);
+            border: 1px solid rgba(255, 209, 102, 0.45);
+            color: #ffe599;
             padding: 6px 12px;
-            border-radius: 20px;
+            border-radius: 999px;
         }
 
-        .main-content {
+        .main-area {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            position: relative;
-            padding: 15px;
             overflow-y: auto;
+            padding: 14px;
             padding-bottom: 24px;
+            position: relative;
         }
 
-        .tab-screen {
+        .screen {
             display: none;
             flex-direction: column;
             align-items: center;
-            width: 100%;
             gap: 12px;
+            width: 100%;
+            min-height: 100%;
         }
 
-        .tab-screen.active {
+        .screen.active {
             display: flex;
         }
 
-        .clicker-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* Экран кликера: только кнопка, полоса энергии и музыка */
+        .clicker-screen {
             justify-content: center;
+            gap: 24px;
         }
 
-        .score-label {
-            font-size: 15px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.85;
-            margin-bottom: 4px;
-        }
-
-        .score-value {
-            font-size: 50px;
-            font-weight: 800;
-            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            margin-bottom: 6px;
-        }
-
-        .passive-badge {
-            font-size: 13px;
-            background: rgba(0, 0, 0, 0.25);
-            padding: 4px 12px;
+        .music-toggle-btn {
+            background: rgba(0, 0, 0, 0.32);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 8px 16px;
             border-radius: 999px;
-            margin-bottom: 28px;
-            color: #ffe599;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
         }
 
-        .click-btn {
+        .tap-circle {
             width: 215px;
             height: 215px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7 60%, #0369a1 100%);
-            border: 6px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 5px 15px rgba(255, 255, 255, 0.5);
+            background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7 65%, #0369a1 100%);
+            border: 6px solid rgba(255, 255, 255, 0.35);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.42), inset 0 6px 16px rgba(255, 255, 255, 0.45);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 105px;
+            font-size: 104px;
             cursor: pointer;
-            transition: transform 0.08s ease;
+            transition: transform 0.07s ease;
             position: relative;
         }
 
-        .click-btn:active {
+        .tap-circle:active {
             transform: scale(0.93);
         }
 
-        .floating-plus {
-            position: absolute;
-            font-size: 28px;
-            font-weight: bold;
+        .energy-wrap {
+            width: 100%;
+            max-width: 340px;
+            background: rgba(0, 0, 0, 0.32);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+            padding: 12px 14px;
+        }
+
+        .energy-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .energy-track {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .energy-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #22c55e, #a3e635);
+            border-radius: 999px;
+            transition: width 0.15s ease;
+        }
+
+        .float-num {
+            position: fixed;
+            font-size: 26px;
+            font-weight: 800;
             color: #fff;
             pointer-events: none;
-            animation: floatUp 0.8s ease-out forwards;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            z-index: 50;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+            animation: popUp 0.75s ease-out forwards;
+            z-index: 60;
         }
 
-        @keyframes floatUp {
+        @keyframes popUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
+            100% { opacity: 0; transform: translateY(-75px) scale(1.25); }
         }
 
-        .card-box {
-            background: rgba(0, 0, 0, 0.35);
-            padding: 18px;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 360px;
+        /* Карточки вкладок */
+        .panel {
             width: 100%;
-            text-align: center;
+            max-width: 380px;
+            background: rgba(0, 0, 0, 0.34);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 22px;
+            padding: 16px;
         }
 
-        .card-box h2 {
-            font-size: 20px;
+        .panel-title {
+            font-size: 18px;
+            font-weight: 800;
+            text-align: center;
             margin-bottom: 12px;
         }
 
-        .upgrade-card {
+        .item-box {
             background: rgba(255, 255, 255, 0.1);
-            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
             border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+            padding: 12px;
             margin-bottom: 10px;
-            text-align: left;
         }
 
-        .upgrade-title {
+        .item-head {
             font-size: 14px;
-            font-weight: bold;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
 
-        .upgrade-desc {
-            font-size: 11px;
+        .item-sub {
+            font-size: 12px;
             opacity: 0.85;
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
-        .upgrade-btn {
-            background: #ffd166;
-            color: #000;
-            border: none;
-            padding: 9px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
+        .gold-btn {
             width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 11px;
+            background: #ffd166;
+            color: #111;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
         }
 
-        .upgrade-btn:disabled {
-            background: rgba(255, 255, 255, 0.25);
+        .gold-btn:disabled {
+            background: rgba(255, 255, 255, 0.22);
             color: rgba(255, 255, 255, 0.55);
             cursor: not-allowed;
         }
 
-        .daily-card {
-            background: rgba(255, 209, 102, 0.14);
-            border: 1px solid rgba(255, 209, 102, 0.4);
-            border-radius: 18px;
-            padding: 14px;
-            margin-bottom: 14px;
-            text-align: left;
+        .invest-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
         }
 
-        .daily-title {
-            font-size: 15px;
-            font-weight: 800;
-            margin-bottom: 4px;
+        .invest-input {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 11px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(0, 0, 0, 0.35);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            outline: none;
         }
 
-        .daily-desc {
-            font-size: 12px;
-            opacity: 0.9;
+        .quick-row {
+            display: flex;
+            gap: 6px;
             margin-bottom: 10px;
         }
 
-        .daily-btn {
+        .chip-btn {
+            flex: 1;
+            padding: 6px;
+            border-radius: 9px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .green-btn {
             width: 100%;
             padding: 11px;
             border: none;
             border-radius: 12px;
             background: #22c55e;
-            color: #06180d;
+            color: #07190e;
             font-size: 13px;
             font-weight: 800;
             cursor: pointer;
         }
 
-        .daily-btn:disabled {
+        .green-btn:disabled {
             background: rgba(255, 255, 255, 0.22);
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.65);
             cursor: not-allowed;
         }
 
-        .ref-link-box {
-            background: rgba(255, 255, 255, 0.12);
+        .ref-link {
+            background: rgba(0, 0, 0, 0.3);
             border: 1px dashed rgba(255, 255, 255, 0.35);
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 10px;
             font-size: 12px;
             word-break: break-all;
             margin: 10px 0;
         }
 
-        .ref-actions {
+        .ref-btns {
             display: flex;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
-        .secondary-btn {
+        .sec-btn {
             flex: 1;
-            background: rgba(255, 255, 255, 0.18);
-            color: #fff;
+            padding: 10px;
+            border-radius: 11px;
             border: 1px solid rgba(255, 255, 255, 0.25);
-            padding: 10px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 12px;
             font-weight: 700;
-            font-size: 13px;
             cursor: pointer;
         }
 
-        .primary-share-btn {
-            flex: 1.4;
-            background: #22c55e;
-            color: #081b10;
-            border: none;
-            padding: 10px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 13px;
-            cursor: pointer;
-        }
-
-        .ref-stats {
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 14px;
-            padding: 10px;
-            font-size: 13px;
-            line-height: 1.5;
-            text-align: left;
-        }
-
-        .bottom-nav {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0, 0, 0, 0.45);
-            padding: 10px 6px 20px 6px;
+        /* Нижнее меню: 4 кнопки с центральной кнопкой кликера */
+        .bottom-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.2fr 1fr;
+            align-items: end;
+            background: rgba(0, 0, 0, 0.5);
             border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 8px 6px 18px 6px;
+            gap: 4px;
         }
 
-        .nav-btn {
+        .nav-item {
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.65);
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 3px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             cursor: pointer;
-            padding: 6px 10px;
+            padding: 6px 4px;
             border-radius: 14px;
         }
 
-        .nav-btn.active {
+        .nav-item.active {
             color: #ffffff;
             background: rgba(255, 255, 255, 0.15);
         }
 
-        .nav-icon {
-            font-size: 20px;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 20px;
-        }
-
-        .modal-box {
-            background: #1e1e24;
-            padding: 28px 24px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 340px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .modal-box h3 {
-            margin-bottom: 10px;
-            font-size: 22px;
-        }
-
-        .modal-box p {
-            font-size: 14px;
-            color: #aaa;
-            margin-bottom: 20px;
-        }
-
-        .modal-box input {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: 1px solid #444;
-            background: #2b2b33;
+        .nav-item.center-btn {
+            transform: translateY(-10px);
+            background: linear-gradient(180deg, #38bdf8, #0284c7);
             color: #fff;
-            font-size: 16px;
-            margin-bottom: 16px;
-            outline: none;
-            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.55);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+            padding: 8px 6px;
         }
 
-        .modal-box button {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: #ff5500;
-            color: #fff;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
+        .nav-item.center-btn.active {
+            background: linear-gradient(180deg, #7dd3fc, #0369a1);
+        }
+
+        .nav-ico {
+            font-size: 19px;
         }
     </style>
 </head>
 <body>
 
-    <div class="modal-overlay" id="regModal">
-        <div class="modal-box">
-            <h3>Добро пожаловать!</h3>
-            <p>Придумай имя игрока перед началом игры</p>
-            <input type="text" id="usernameInput" placeholder="Твой никнейм..." maxlength="15">
-            <button id="saveUsernameBtn">Начать игру</button>
-        </div>
+    <div class="top-bar">
+        <div id="topStatus">Тап: +1 • Реген: +1/с</div>
+        <div class="balance-pill" id="topBalance">0 🪙</div>
     </div>
 
-    <div class="header">
-        <div class="player-info">
-            <span>👤</span>
-            <span id="displayUsername">Игрок</span>
-        </div>
-        <div class="energy-info">
-            <span>⚡</span>
-            <span id="displayEnergy">5000</span> / <span id="displayMaxEnergy">5000</span>
-        </div>
-    </div>
+    <div class="main-area">
 
-    <div class="main-content">
+        <!-- 1. Улучшение -->
+        <div class="screen" id="screen-upgrade">
+            <div class="panel">
+                <div class="panel-title">⚡ Улучшения</div>
 
-        <div class="tab-screen" id="tab-upgrade">
-            <div class="card-box">
-                <h2>🤑 Магазин улучшений</h2>
-
-                <div class="upgrade-card">
-                    <div class="upgrade-title" id="tapTitle">Сила тапа: +1</div>
-                    <div class="upgrade-desc" id="tapDesc">Увеличить силу тапа</div>
-                    <button class="upgrade-btn" id="tapUpgradeBtn">Купить</button>
+                <div class="item-box">
+                    <div class="item-head" id="tapLabel">Сила клика: +1</div>
+                    <div class="item-sub" id="tapSub">Увеличивает монеты за один клик</div>
+                    <button class="gold-btn" id="buyTapBtn">Улучшить</button>
                 </div>
 
-                <div class="upgrade-card">
-                    <div class="upgrade-title" id="energyCapTitle">Емкость: 5 000</div>
-                    <div class="upgrade-desc" id="energyCapDesc">Увеличить макс. энергию</div>
-                    <button class="upgrade-btn" id="energyCapBtn">Купить</button>
+                <div class="item-box">
+                    <div class="item-head" id="capLabel">Объём энергии: 5 000</div>
+                    <div class="item-sub" id="capSub">Увеличивает максимальный запас энергии</div>
+                    <button class="gold-btn" id="buyCapBtn">Улучшить</button>
                 </div>
 
-                <div class="upgrade-card">
-                    <div class="upgrade-title" id="regenTitle">Приток: +1/сек</div>
-                    <div class="upgrade-desc" id="regenDesc">Ускорить прибавление энергии</div>
-                    <button class="upgrade-btn" id="regenBtn">Купить</button>
+                <div class="item-box">
+                    <div class="item-head" id="regenLabel">Скорость восстановления: +1/сек</div>
+                    <div class="item-sub" id="regenSub">Увеличивает приток энергии каждую секунду</div>
+                    <button class="gold-btn" id="buyRegenBtn">Улучшить</button>
                 </div>
 
-                <div class="upgrade-card">
-                    <div class="upgrade-title" id="passiveTitle">Пассивный доход: +0/сек</div>
-                    <div class="upgrade-desc" id="passiveDesc">Монеты капают каждую секунду</div>
-                    <button class="upgrade-btn" id="passiveBtn">Купить</button>
-                </div>
-
-                <div class="upgrade-card">
-                    <div class="upgrade-title">⚡ Полный заряд батареи</div>
-                    <div class="upgrade-desc" id="refillDesc">Мгновенно восполняет энергию до максимума</div>
-                    <button class="upgrade-btn" id="refillBtn">Восстановить</button>
+                <div class="item-box">
+                    <div class="item-head">📈 Пассивный доход (+12% каждые 24ч)</div>
+                    <div class="item-sub" id="passiveInfo">
+                        Вложено: <b>0 🪙</b> • Выплата раз в 24ч: <b>+0 🪙</b><br>
+                        <span id="passiveTimer">Следующее начисление: через 24:00:00</span>
+                    </div>
+                    <div class="invest-row">
+                        <input type="number" class="invest-input" id="investAmountInput" placeholder="Сумма вложения" min="1">
+                    </div>
+                    <div class="quick-row">
+                        <button class="chip-btn" data-add="100">+100</button>
+                        <button class="chip-btn" data-add="500">+500</button>
+                        <button class="chip-btn" data-add="1000">+1 000</button>
+                        <button class="chip-btn" id="maxInvestBtn">MAX</button>
+                    </div>
+                    <button class="green-btn" id="investBtn">Вложить монеты</button>
                 </div>
             </div>
         </div>
 
-        <div class="tab-screen active clicker-container" id="tab-clicker">
-            <div class="score-label">Баланс монет</div>
-            <div class="score-value" id="displayScore">0</div>
-            <div class="passive-badge" id="passiveBadge">Доход: +0/сек • Тап: +1</div>
-
-            <div class="click-btn" id="clickBtn">😗</div>
-        </div>
-
-        <div class="tab-screen" id="tab-friends">
-            <div class="card-box">
-                <h2>👥 Пригласи друзей</h2>
-                <p style="font-size: 13px; opacity: 0.92; line-height: 1.45;">
+        <!-- 2. Друзья -->
+        <div class="screen" id="screen-friends">
+            <div class="panel">
+                <div class="panel-title">👥 Друзья</div>
+                <div class="item-sub" style="text-align: center;">
                     За переход по ссылке — <b>+1 000 🪙</b><br>
-                    Бонус от дохода рефералов — <b>5%</b>
-                </p>
-
-                <div class="ref-link-box" id="refLinkText">Загрузка ссылки...</div>
-
-                <div class="ref-actions">
-                    <button class="secondary-btn" id="copyRefBtn">📋 Копировать</button>
-                    <button class="primary-share-btn" id="shareRefBtn">🚀 Поделиться</button>
+                    Бонус от дохода — <b>5%</b>
                 </div>
-
-                <div class="ref-stats">
-                    <div>Твой ID: <b id="myRefId">—</b></div>
-                    <div>Приглашено друзей: <b id="refCountDisplay">0</b></div>
-                    <div>5% от твоего дохода/сек: <b id="fivePercentIncome">0.00 / сек</b></div>
-                    <div>Накоплено 5% бонуса: <b id="refEarnedDisplay">0.00 🪙</b></div>
-                    <div id="invitedByText" style="color: #ffd166; margin-top: 6px;"></div>
+                <div class="ref-link" id="refLinkBox">Загрузка...</div>
+                <div class="ref-btns">
+                    <button class="sec-btn" id="copyLinkBtn">📋 Копировать</button>
+                    <button class="green-btn" style="flex: 1.4;" id="shareLinkBtn">🚀 Поделиться</button>
+                </div>
+                <div class="item-sub" style="margin-bottom: 0;">
+                    Твой ID: <b id="refIdLabel">—</b><br>
+                    Накоплено 5% от дохода: <b id="refPercentEarned">0.00 🪙</b><br>
+                    <span id="invitedNotice" style="color: #ffd166;"></span>
                 </div>
             </div>
         </div>
 
-        <div class="tab-screen" id="tab-news">
-            <div class="card-box">
-                <h2>🎁 Ежедневная награда</h2>
-                <div class="daily-card">
-                    <div class="daily-title">Бонус каждые 23 часа: +500 🪙</div>
-                    <div class="daily-desc" id="dailyStatusText">Проверяем доступность награды...</div>
-                    <button class="daily-btn" id="claimDailyBtn">Забрать +500 🪙</button>
+        <!-- 3. Кликер (по центру: только кнопка, полоса энергии и фоновая музыка) -->
+        <div class="screen active clicker-screen" id="screen-clicker">
+            <button class="music-toggle-btn" id="musicBtn">🎵 Музыка: ВЫКЛ</button>
+
+            <div class="tap-circle" id="tapBtn">🐉</div>
+
+            <div class="energy-wrap">
+                <div class="energy-top">
+                    <span>⚡ Энергия</span>
+                    <span id="energyText">5000 / 5000</span>
+                </div>
+                <div class="energy-track">
+                    <div class="energy-bar" id="energyBar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Новости и бонусы -->
+        <div class="screen" id="screen-news">
+            <div class="panel">
+                <div class="panel-title">🎁 Ежедневный подарок</div>
+                <div class="item-box">
+                    <div class="item-head">Подарок раз в 24 часа: +500 🪙</div>
+                    <div class="item-sub" id="dailyGiftStatus">Проверяем подарок...</div>
+                    <button class="green-btn" id="claimGiftBtn">Забрать подарок</button>
                 </div>
 
-                <h2>📢 Новости</h2>
-                <p style="text-align: left; font-size: 13px; line-height: 1.5;">
-                    <b>Исправленный запуск</b><br>
-                    • +1 000 🪙 за переход по ссылке<br>
-                    • 5% от дохода<br>
-                    • Ежедневная награда +500 🪙 каждые 23 часа
-                </p>
+                <div class="panel-title" style="margin-top: 14px;">📢 Последнее обновление</div>
+                <div class="item-box" style="margin-bottom: 0;">
+                    <div class="item-head">Обновление интерфейса и пассива</div>
+                    <div class="item-sub" style="margin-bottom: 0;">
+                        • Кнопка кликера по центру с полосой энергии и фоновой мелодией.<br>
+                        • В улучшениях: сила клика, объём энергии, скорость восстановления и пассивный доход +12% каждые 24 часа.<br>
+                        • Рефералы: +1 000 🪙 за переход и 5% от дохода.
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <div class="bottom-nav">
-        <button class="nav-btn" data-tab="upgrade">
-            <span class="nav-icon">🤑</span>
-            <span>Прокачка</span>
+    <div class="bottom-bar">
+        <button class="nav-item" data-screen="upgrade">
+            <span class="nav-ico">⚡</span>
+            <span>Улучшение</span>
         </button>
-        <button class="nav-btn active" data-tab="clicker">
-            <span class="nav-icon">👇</span>
-            <span>Кликер</span>
-        </button>
-        <button class="nav-btn" data-tab="friends">
-            <span class="nav-icon">👥</span>
+        <button class="nav-item" data-screen="friends">
+            <span class="nav-ico">👥</span>
             <span>Друзья</span>
         </button>
-        <button class="nav-btn" data-tab="news">
-            <span class="nav-icon">🎁</span>
-            <span>Бонусы</span>
+        <button class="nav-item center-btn active" data-screen="clicker">
+            <span class="nav-ico">👆</span>
+            <span>Кликер</span>
+        </button>
+        <button class="nav-item" data-screen="news">
+            <span class="nav-ico">🎁</span>
+            <span>Новости</span>
         </button>
     </div>
 
     <script>
         (function () {
             const BOT_USERNAME = 'ВАШ_БОТ';
-            const REF_BONUS = 1000;
-            const REF_INCOME_SHARE = 0.05;
-            const DAILY_REWARD = 500;
-            const DAILY_COOLDOWN_MS = 23 * 60 * 60 * 1000;
-            const REFILL_COST = 300;
+            const DAY_MS = 24 * 60 * 60 * 1000;
+            const PASSIVE_RATE = 0.12; // +12% каждые 24 часа
+            const DAILY_GIFT_AMOUNT = 500;
+            const REF_JOIN_BONUS = 1000;
+            const REF_INCOME_RATE = 0.05;
 
-            const memoryStorage = {};
-            function storageGet(key) {
-                try {
-                    return window.localStorage.getItem(key);
-                } catch (e) {
-                    return Object.prototype.hasOwnProperty.call(memoryStorage, key) ? memoryStorage[key] : null;
-                }
+            const mem = {};
+            function getStore(k) {
+                try { return window.localStorage.getItem(k); }
+                catch (e) { return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; }
             }
-            function storageSet(key, val) {
-                const str = String(val);
-                memoryStorage[key] = str;
-                try {
-                    window.localStorage.setItem(key, str);
-                } catch (e) {}
+            function setStore(k, v) {
+                const s = String(v);
+                mem[k] = s;
+                try { window.localStorage.setItem(k, s); } catch (e) {}
             }
 
             const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -541,63 +498,396 @@
                 try { tg.expand(); } catch (e) {}
             }
 
-            let playerId = storageGet('clicker_playerId');
+            let playerId = getStore('tma_playerId');
             if (!playerId) {
-                const tgUserId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id;
-                playerId = tgUserId ? String(tgUserId) : 'u_' + Math.random().toString(36).substring(2, 9);
-                storageSet('clicker_playerId', playerId);
+                const tgId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id;
+                playerId = tgId ? String(tgId) : 'id_' + Math.random().toString(36).substring(2, 9);
+                setStore('tma_playerId', playerId);
             }
 
-            let score = parseInt(storageGet('clicker_score'), 10) || 0;
-            const tgFirstName = tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.first_name;
-            let username = storageGet('clicker_username') || tgFirstName || '';
+            let balance = parseFloat(getStore('tma_balance')) || 0;
+            let tapPower = parseInt(getStore('tma_tapPower'), 10) || 1;
+            let tapLevel = parseInt(getStore('tma_tapLevel'), 10) || 0;
 
-            let tapPower = parseInt(storageGet('clicker_tapPower'), 10) || 1;
-            let tapLevel = parseInt(storageGet('clicker_tapLevel'), 10) || 0;
+            let maxEnergy = parseInt(getStore('tma_maxEnergy'), 10) || 5000;
+            let capLevel = parseInt(getStore('tma_capLevel'), 10) || 0;
 
-            let maxEnergy = parseInt(storageGet('clicker_maxEnergy'), 10) || 5000;
-            let energyCapLevel = parseInt(storageGet('clicker_energyCapLevel'), 10) || 0;
+            let regenRate = parseInt(getStore('tma_regenRate'), 10) || 1;
+            let regenLevel = parseInt(getStore('tma_regenLevel'), 10) || 0;
 
-            let regenRate = parseInt(storageGet('clicker_regenRate'), 10) || 1;
-            let regenLevel = parseInt(storageGet('clicker_regenLevel'), 10) || 0;
-
-            let passiveIncome = parseInt(storageGet('clicker_passiveIncome'), 10) || 0;
-            let passiveLevel = parseInt(storageGet('clicker_passiveLevel'), 10) || 0;
-
-            let refCount = parseInt(storageGet('clicker_refCount'), 10) || 0;
-            let invitedBy = storageGet('clicker_invitedBy') || '';
-            let refBonusClaimed = storageGet('clicker_refBonusClaimed') === 'true';
-            let refEarnedFromIncome = parseFloat(storageGet('clicker_refEarnedFromIncome')) || 0;
-
-            let lastDailyClaim = parseInt(storageGet('clicker_lastDailyClaim'), 10) || 0;
-
-            const savedEnergy = storageGet('clicker_energy');
+            const savedEnergy = getStore('tma_energy');
             let energy = savedEnergy !== null ? parseInt(savedEnergy, 10) : maxEnergy;
             if (Number.isNaN(energy)) energy = maxEnergy;
 
-            function onPlayerIncomeGain(amount) {
+            // Пассивный доход: любая вложенная сумма + 12% каждые 24 часа
+            let investedAmount = parseFloat(getStore('tma_investedAmount')) || 0;
+            let lastPassiveClaim = parseInt(getStore('tma_lastPassiveClaim'), 10) || 0;
+
+            // Ежедневный подарок раз в 24 часа
+            let lastDailyGift = parseInt(getStore('tma_lastDailyGift'), 10) || 0;
+
+            // Рефералы
+            let invitedBy = getStore('tma_invitedBy') || '';
+            let refJoinClaimed = getStore('tma_refJoinClaimed') === 'true';
+            let refPercentEarned = parseFloat(getStore('tma_refPercentEarned')) || 0;
+
+            function addIncome(amount) {
                 if (!amount || amount <= 0) return;
-                refEarnedFromIncome += amount * REF_INCOME_SHARE;
-                storageSet('clicker_refEarnedFromIncome', refEarnedFromIncome.toFixed(2));
+                balance += amount;
+                refPercentEarned += amount * REF_INCOME_RATE;
+                setStore('tma_refPercentEarned', refPercentEarned.toFixed(2));
             }
 
-            const lastSavedTime = storageGet('lastExitTime');
-            if (lastSavedTime) {
-                const elapsedSeconds = Math.max(0, Math.floor((Date.now() - Number(lastSavedTime)) / 1000));
-                if (elapsedSeconds > 0) {
-                    energy = Math.min(maxEnergy, energy + elapsedSeconds * regenRate);
-                    const cappedSeconds = Math.min(elapsedSeconds, 10800);
-                    if (passiveIncome > 0) {
-                        const offlineEarned = cappedSeconds * passiveIncome;
-                        score += offlineEarned;
-                        onPlayerIncomeGain(offlineEarned);
+            // Начисление пассивного дохода +12% за каждые полные 24 часа (офлайн и онлайн)
+            function processPassiveCycles() {
+                if (investedAmount <= 0) return;
+                const now = Date.now();
+                if (!lastPassiveClaim) {
+                    lastPassiveClaim = now;
+                    setStore('tma_lastPassiveClaim', lastPassiveClaim);
+                    return;
+                }
+                const elapsed = now - lastPassiveClaim;
+                if (elapsed >= DAY_MS) {
+                    const cycles = Math.floor(elapsed / DAY_MS);
+                    const payout = investedAmount * PASSIVE_RATE * cycles;
+                    lastPassiveClaim += cycles * DAY_MS;
+                    addIncome(payout);
+                    setStore('tma_lastPassiveClaim', lastPassiveClaim);
+                }
+            }
+
+            // Офлайн восстановление энергии
+            const lastExit = parseInt(getStore('tma_lastExit'), 10) || 0;
+            if (lastExit > 0) {
+                const secPassed = Math.max(0, Math.floor((Date.now() - lastExit) / 1000));
+                if (secPassed > 0) {
+                    energy = Math.min(maxEnergy, energy + secPassed * regenRate);
+                }
+            }
+            processPassiveCycles();
+
+            // Реферальный startapp
+            const urlParam = new URLSearchParams(window.location.search).get('tgWebAppStartParam') || '';
+            const startParam = (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) || urlParam;
+            if (startParam && startParam !== playerId && !refJoinClaimed) {
+                invitedBy = startParam;
+                refJoinClaimed = true;
+                balance += REF_JOIN_BONUS;
+                setStore('tma_invitedBy', invitedBy);
+                setStore('tma_refJoinClaimed', 'true');
+            }
+
+            // Фоновая мелодия в стиле восточной/династийной пентатоники (Web Audio API)
+            let audioCtx = null;
+            let musicTimer = null;
+            let musicOn = false;
+            const pentatonicFreqs = [293.66, 329.63, 392.00, 440.00, 523.25, 587.33]; // D, E, G, A, C, D
+
+            function playMelodyNote() {
+                if (!musicOn) return;
+                try {
+                    if (!audioCtx) {
+                        const Ctx = window.AudioContext || window.webkitAudioContext;
+                        if (!Ctx) return;
+                        audioCtx = new Ctx();
+                    }
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                    const freq = pentatonicFreqs[Math.floor(Math.random() * pentatonicFreqs.length)];
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                    gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.035, audioCtx.currentTime + 0.08);
+                    gain.gain.exponentialRampToValueAtTime(0.0008, audioCtx.currentTime + 1.1);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 1.15);
+                } catch (e) {}
+            }
+
+            function toggleMusic() {
+                musicOn = !musicOn;
+                const musicBtn = document.getElementById('musicBtn');
+                if (musicOn) {
+                    musicBtn.textContent = '🎵 Музыка: ВКЛ';
+                    playMelodyNote();
+                    musicTimer = setInterval(playMelodyNote, 750);
+                } else {
+                    musicBtn.textContent = '🎵 Музыка: ВЫКЛ';
+                    if (musicTimer) {
+                        clearInterval(musicTimer);
+                        musicTimer = null;
                     }
                 }
             }
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const startParam = (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param)
-                || urlParams.get('tgWebAppStartParam')
-                || '';
+            function getUpgradeCost(type, level) {
+                if (type === 'tap') return [100, 1000, 5000, 20000][level] || null;
+                if (type === 'cap') return [1000, 5000, 10000, 30000][level] || null;
+                if (type === 'regen') return [500, 2000, 5000, 10000, 25000][level] || null;
+                return null;
+            }
 
-            if (startParam && sta
+            function formatHMS(ms) {
+                const totalSec = Math.max(0, Math.floor(ms / 1000));
+                const h = Math.floor(totalSec / 3600);
+                const m = Math.floor((totalSec % 3600) / 60);
+                const s = totalSec % 60;
+                const pad = function (n) { return String(n).padStart(2, '0'); };
+                return pad(h) + ':' + pad(m) + ':' + pad(s);
+            }
+
+            function saveAll() {
+                setStore('tma_balance', balance);
+                setStore('tma_tapPower', tapPower);
+                setStore('tma_tapLevel', tapLevel);
+                setStore('tma_maxEnergy', maxEnergy);
+                setStore('tma_capLevel', capLevel);
+                setStore('tma_regenRate', regenRate);
+                setStore('tma_regenLevel', regenLevel);
+                setStore('tma_energy', energy);
+                setStore('tma_investedAmount', investedAmount);
+                setStore('tma_lastPassiveClaim', lastPassiveClaim);
+                setStore('tma_lastDailyGift', lastDailyGift);
+                setStore('tma_lastExit', Date.now());
+            }
+
+            function render() {
+                processPassiveCycles();
+                saveAll();
+
+                document.getElementById('topBalance').textContent = Math.floor(balance).toLocaleString('ru-RU') + ' 🪙';
+                document.getElementById('topStatus').textContent = 'Тап: +' + tapPower + ' • Реген: +' + regenRate + '/с';
+
+                document.getElementById('energyText').textContent = energy + ' / ' + maxEnergy;
+                const pct = Math.max(0, Math.min(100, (energy / maxEnergy) * 100));
+                document.getElementById('energyBar').style.width = pct + '%';
+
+                // Улучшение 1: Сила клика
+                const tapCost = getUpgradeCost('tap', tapLevel);
+                document.getElementById('tapLabel').textContent = 'Сила клика: +' + tapPower;
+                const buyTapBtn = document.getElementById('buyTapBtn');
+                if (tapCost !== null) {
+                    const nextTap = [2, 5, 10, 25][tapLevel];
+                    document.getElementById('tapSub').textContent = 'Следующий уровень: +' + nextTap + ' за клик • Цена: ' + tapCost.toLocaleString('ru-RU') + ' 🪙';
+                    buyTapBtn.textContent = 'Купить (' + tapCost.toLocaleString('ru-RU') + ' 🪙)';
+                    buyTapBtn.disabled = balance < tapCost;
+                } else {
+                    document.getElementById('tapSub').textContent = 'Максимальный уровень силы клика';
+                    buyTapBtn.textContent = 'МАКС';
+                    buyTapBtn.disabled = true;
+                }
+
+                // Улучшение 2: Объём энергии
+                const capCost = getUpgradeCost('cap', capLevel);
+                document.getElementById('capLabel').textContent = 'Объём энергии: ' + maxEnergy.toLocaleString('ru-RU');
+                const buyCapBtn = document.getElementById('buyCapBtn');
+                if (capCost !== null) {
+                    const nextCap = [10000, 25000, 50000, 100000][capLevel];
+                    document.getElementById('capSub').textContent = 'Следующий объём: ' + nextCap.toLocaleString('ru-RU') + ' • Цена: ' + capCost.toLocaleString('ru-RU') + ' 🪙';
+                    buyCapBtn.textContent = 'Купить (' + capCost.toLocaleString('ru-RU') + ' 🪙)';
+                    buyCapBtn.disabled = balance < capCost;
+                } else {
+                    document.getElementById('capSub').textContent = 'Максимальный объём энергии';
+                    buyCapBtn.textContent = 'МАКС';
+                    buyCapBtn.disabled = true;
+                }
+
+                // Улучшение 3: Скорость восстановления энергии
+                const regenCost = getUpgradeCost('regen', regenLevel);
+                document.getElementById('regenLabel').textContent = 'Скорость восстановления: +' + regenRate + '/сек';
+                const buyRegenBtn = document.getElementById('buyRegenBtn');
+                if (regenCost !== null) {
+                    const nextRegen = regenRate + 1;
+                    document.getElementById('regenSub').textContent = 'Следующая скорость: +' + nextRegen + '/сек • Цена: ' + regenCost.toLocaleString('ru-RU') + ' 🪙';
+                    buyRegenBtn.textContent = 'Купить (' + regenCost.toLocaleString('ru-RU') + ' 🪙)';
+                    buyRegenBtn.disabled = balance < regenCost;
+                } else {
+                    document.getElementById('regenSub').textContent = 'Максимальная скорость восстановления';
+                    buyRegenBtn.textContent = 'МАКС';
+                    buyRegenBtn.disabled = true;
+                }
+
+                // Пассивный доход +12% каждые 24 часа
+                const dailyPayout = investedAmount * PASSIVE_RATE;
+                document.getElementById('passiveInfo').innerHTML =
+                    'Вложено: <b>' + Math.floor(investedAmount).toLocaleString('ru-RU') + ' 🪙</b> • Выплата раз в 24ч: <b>+' + dailyPayout.toFixed(1) + ' 🪙</b><br>' +
+                    '<span id="passiveTimer"></span>';
+
+                const timerEl = document.getElementById('passiveTimer');
+                if (investedAmount > 0 && lastPassiveClaim > 0) {
+                    const leftMs = Math.max(0, DAY_MS - (Date.now() - lastPassiveClaim));
+                    timerEl.textContent = 'Следующее начисление (+12%): через ' + formatHMS(leftMs);
+                } else {
+                    timerEl.textContent = 'Вложи любую сумму, чтобы получать +12% каждые 24 часа';
+                }
+
+                const inputVal = parseFloat(document.getElementById('investAmountInput').value);
+                document.getElementById('investBtn').disabled = !(inputVal > 0 && inputVal <= balance);
+
+                // Друзья
+                const refUrl = 'https://t.me/' + BOT_USERNAME + '?startapp=' + encodeURIComponent(playerId);
+                document.getElementById('refLinkBox').textContent = refUrl;
+                document.getElementById('refIdLabel').textContent = playerId;
+                document.getElementById('refPercentEarned').textContent = refPercentEarned.toFixed(2) + ' 🪙';
+                document.getElementById('invitedNotice').textContent = invitedBy
+                    ? 'Вы зашли по приглашению (' + invitedBy + ') и получили +' + REF_JOIN_BONUS.toLocaleString('ru-RU') + ' 🪙'
+                    : '';
+
+                // Ежедневный подарок раз в 24 часа
+                const giftElapsed = Date.now() - lastDailyGift;
+                const giftReady = lastDailyGift === 0 || giftElapsed >= DAY_MS;
+                const giftBtn = document.getElementById('claimGiftBtn');
+                const giftStatus = document.getElementById('dailyGiftStatus');
+                if (giftReady) {
+                    giftStatus.textContent = 'Подарок готов! Забери +' + DAILY_GIFT_AMOUNT + ' 🪙';
+                    giftBtn.disabled = false;
+                    giftBtn.textContent = 'Забрать +' + DAILY_GIFT_AMOUNT + ' 🪙';
+                } else {
+                    const rem = formatHMS(DAY_MS - giftElapsed);
+                    giftStatus.textContent = 'Следующий подарок через ' + rem;
+                    giftBtn.disabled = true;
+                    giftBtn.textContent = 'Через ' + rem;
+                }
+            }
+
+            // Клик по главной кнопке
+            document.getElementById('tapBtn').addEventListener('pointerdown', function (e) {
+                if (energy >= tapPower) {
+                    energy -= tapPower;
+                    addIncome(tapPower);
+                    render();
+
+                    const num = document.createElement('div');
+                    num.className = 'float-num';
+                    num.textContent = '+' + tapPower;
+                    num.style.left = (e.clientX - 14) + 'px';
+                    num.style.top = (e.clientY - 26) + 'px';
+                    document.body.appendChild(num);
+                    setTimeout(function () { num.remove(); }, 750);
+                }
+            });
+
+            document.getElementById('musicBtn').addEventListener('click', toggleMusic);
+
+            document.getElementById('buyTapBtn').addEventListener('click', function () {
+                const cost = getUpgradeCost('tap', tapLevel);
+                if (cost !== null && balance >= cost) {
+                    balance -= cost;
+                    tapPower = [2, 5, 10, 25][tapLevel];
+                    tapLevel += 1;
+                    render();
+                }
+            });
+
+            document.getElementById('buyCapBtn').addEventListener('click', function () {
+                const cost = getUpgradeCost('cap', capLevel);
+                if (cost !== null && balance >= cost) {
+                    balance -= cost;
+                    maxEnergy = [10000, 25000, 50000, 100000][capLevel];
+                    capLevel += 1;
+                    render();
+                }
+            });
+
+            document.getElementById('buyRegenBtn').addEventListener('click', function () {
+                const cost = getUpgradeCost('regen', regenLevel);
+                if (cost !== null && balance >= cost) {
+                    balance -= cost;
+                    regenRate += 1;
+                    regenLevel += 1;
+                    render();
+                }
+            });
+
+            document.getElementById('investAmountInput').addEventListener('input', render);
+
+            document.querySelectorAll('.chip-btn[data-add]').forEach(function (chip) {
+                chip.addEventListener('click', function () {
+                    const add = parseFloat(chip.getAttribute('data-add')) || 0;
+                    const inp = document.getElementById('investAmountInput');
+                    const cur = parseFloat(inp.value) || 0;
+                    inp.value = Math.min(Math.floor(balance), cur + add);
+                    render();
+                });
+            });
+
+            document.getElementById('maxInvestBtn').addEventListener('click', function () {
+                document.getElementById('investAmountInput').value = Math.floor(balance);
+                render();
+            });
+
+            document.getElementById('investBtn').addEventListener('click', function () {
+                const inp = document.getElementById('investAmountInput');
+                const amt = parseFloat(inp.value);
+                if (amt > 0 && amt <= balance) {
+                    processPassiveCycles();
+                    balance -= amt;
+                    investedAmount += amt;
+                    if (!lastPassiveClaim) {
+                        lastPassiveClaim = Date.now();
+                    }
+                    inp.value = '';
+                    render();
+                }
+            });
+
+            document.getElementById('claimGiftBtn').addEventListener('click', function () {
+                const giftElapsed = Date.now() - lastDailyGift;
+                if (lastDailyGift === 0 || giftElapsed >= DAY_MS) {
+                    lastDailyGift = Date.now();
+                    addIncome(DAILY_GIFT_AMOUNT);
+                    render();
+                }
+            });
+
+            document.getElementById('copyLinkBtn').addEventListener('click', function () {
+                const url = 'https://t.me/' + BOT_USERNAME + '?startapp=' + encodeURIComponent(playerId);
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).catch(function () {});
+                }
+            });
+
+            document.getElementById('shareLinkBtn').addEventListener('click', function () {
+                const url = 'https://t.me/' + BOT_USERNAME + '?startapp=' + encodeURIComponent(playerId);
+                const text = 'Заходи в кликер и получи +' + REF_JOIN_BONUS.toLocaleString('ru-RU') + ' монет!';
+                const shareLink = 'https://t.me/share/url?url=' + encodeURIComponent(url) + '&text=' + encodeURIComponent(text);
+                if (tg && tg.openTelegramLink) {
+                    tg.openTelegramLink(shareLink);
+                } else {
+                    window.open(shareLink, '_blank');
+                }
+            });
+
+            // Навигация по 4 кнопкам
+            document.querySelectorAll('.nav-item').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const target = btn.getAttribute('data-screen');
+                    document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); });
+                    document.querySelectorAll('.nav-item').forEach(function (b) { b.classList.remove('active'); });
+                    document.getElementById('screen-' + target).classList.add('active');
+                    btn.classList.add('active');
+                });
+            });
+
+            // Восстановление энергии каждую секунду и обновление таймеров
+            setInterval(function () {
+                if (energy < maxEnergy) {
+                    energy = Math.min(maxEnergy, energy + regenRate);
+                }
+                render();
+            }, 1000);
+
+            window.addEventListener('beforeunload', saveAll);
+            render();
+        })();
+    </script>
+</body>
+</html>
