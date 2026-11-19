@@ -1,505 +1,886 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Core Upgrades</title>
+  <title>МяуTap — КотоКликер для Telegram</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    :root {
+      --bg: #121018;
+      --bg-card: #1d1928;
+      --bg-card-hover: #262134;
+      --accent: #ff9e44;
+      --accent-2: #ff6b8b;
+      --green: #4ade80;
+      --text: #f8f7fc;
+      --muted: #9f98b5;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      user-select: none;
       -webkit-tap-highlight-color: transparent;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      user-select: none;
     }
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 50% 18%, #1e293b 0%, #0b1120 65%, #050811 100%);
-      color: #f8fafc;
-      overflow: hidden;
-      touch-action: manipulation;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top, #271f3b 0%, var(--bg) 60%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
     }
 
     .app {
       width: 100%;
-      height: 100%;
-      max-width: 520px;
-      margin: 0 auto;
+      max-width: 460px;
+      min-height: 100vh;
+      padding: 16px 16px 92px;
       display: flex;
       flex-direction: column;
-      padding: 12px;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .top {
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
       padding: 12px 16px;
     }
 
-    .coins {
-      font-size: 24px;
-      font-weight: 900;
-      color: #facc15;
-      font-variant-numeric: tabular-nums;
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .rates {
-      text-align: right;
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+    }
+
+    .user-name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .user-sub {
       font-size: 12px;
-      color: #94a3b8;
-      line-height: 1.4;
-      font-variant-numeric: tabular-nums;
+      color: var(--muted);
     }
 
-    .stage {
-      flex: 1;
-      min-height: 220px;
+    .passive-badge {
+      background: rgba(74, 222, 128, 0.12);
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      color: var(--green);
+      padding: 6px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .balance-box {
+      text-align: center;
+      padding: 6px 0;
+    }
+
+    .balance-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .balance-value {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #ffd166, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cat-stage {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: rgba(15, 23, 42, 0.55);
-      border: 1px solid rgba(148, 163, 184, 0.16);
-      border-radius: 22px;
+      padding: 18px 0;
+    }
+
+    .cat-btn {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      border: 3px solid rgba(255, 158, 68, 0.35);
+      background: radial-gradient(circle at 35% 30%, #372b52, #1b1529 75%);
+      box-shadow: 0 18px 45px rgba(255, 158, 68, 0.18), inset 0 0 30px rgba(255, 255, 255, 0.05);
+      font-size: 96px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.15s ease;
+      position: relative;
+    }
+
+    .cat-btn:active {
+      transform: scale(0.93);
+      box-shadow: 0 8px 25px rgba(255, 158, 68, 0.32);
+    }
+
+    .floating-text {
+      position: absolute;
+      font-weight: 800;
+      font-size: 22px;
+      color: #ffd166;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.65);
+      pointer-events: none;
+      animation: floatUp 0.85s ease-out forwards;
+      z-index: 10;
+    }
+
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(0.9);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -85px) scale(1.15);
+      }
+    }
+
+    .energy-box {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+
+    .energy-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: var(--muted);
+    }
+
+    .energy-top strong {
+      color: var(--text);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
       overflow: hidden;
     }
 
-    .orbit {
-      position: relative;
-      width: 210px;
-      height: 210px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .drone {
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fef08a, #f97316);
-      box-shadow: 0 0 14px rgba(251, 146, 60, 0.9);
-      display: none;
-      pointer-events: none;
-    }
-
-    .core-btn {
-      width: 148px;
-      height: 148px;
-      border-radius: 50%;
-      border: 4px solid rgba(125, 211, 252, 0.75);
-      background: radial-gradient(circle at 35% 30%, #7dd3fc, #0284c7 62%, #1d4ed8 100%);
-      box-shadow: 0 0 36px rgba(14, 165, 233, 0.45), inset 0 6px 18px rgba(255, 255, 255, 0.45);
-      color: #ffffff;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: 0.6px;
-      cursor: pointer;
-      transition: transform 0.07s ease, box-shadow 0.15s ease;
-      z-index: 2;
-    }
-
-    .core-btn:active {
-      transform: scale(0.92);
-    }
-
-    .core-btn.overdrive {
-      border-color: #fde047;
-      background: radial-gradient(circle at 35% 30%, #fde047, #f97316 65%, #db2777 100%);
-      box-shadow: 0 0 44px rgba(249, 115, 22, 0.75), inset 0 6px 18px rgba(255, 255, 255, 0.55);
-    }
-
-    .surge-btn {
-      margin-top: 10px;
-      padding: 8px 16px;
+    .progress-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
       border-radius: 999px;
-      border: 1px solid rgba(250, 204, 21, 0.5);
-      background: rgba(250, 204, 21, 0.16);
-      color: #fde047;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-      z-index: 2;
+      transition: width 0.15s ease;
     }
 
-    .surge-btn:disabled {
-      opacity: 0.45;
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-col {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 3px;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.1s ease, opacity 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #14101d;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.4;
       cursor: not-allowed;
     }
 
-    .float-dmg {
-      position: absolute;
-      font-weight: 900;
-      font-size: 18px;
-      pointer-events: none;
-      animation: flyUp 0.65s ease-out forwards;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-      z-index: 5;
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--text);
     }
 
-    @keyframes flyUp {
-      0% { opacity: 1; transform: translate(-50%, -50%) scale(0.95); }
-      100% { opacity: 0; transform: translate(-50%, -130%) scale(1.2); }
-    }
-
-    .shop {
+    .days-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      max-height: 46%;
-      overflow-y: auto;
+      margin: 10px 0;
     }
 
-    .upg {
-      background: rgba(15, 23, 42, 0.88);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 16px;
-      padding: 11px;
+    .day-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 6px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .day-item.claimed {
+      border-color: rgba(74, 222, 128, 0.45);
+      background: rgba(74, 222, 128, 0.1);
+      color: var(--green);
+    }
+
+    .day-item.current {
+      border-color: var(--accent);
+      background: rgba(255, 158, 68, 0.14);
+    }
+
+    .ref-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-all;
+      margin: 8px 0;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 460px;
+      background: rgba(22, 18, 32, 0.94);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 8px 8px 12px;
+      z-index: 20;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .upg-name {
-      font-size: 13px;
-      font-weight: 800;
-      color: #f8fafc;
-    }
-
-    .upg-stat {
+      align-items: center;
+      gap: 3px;
       font-size: 11px;
-      color: #94a3b8;
-      margin-top: 2px;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .upg-btn {
-      width: 100%;
-      padding: 8px;
-      border: none;
-      border-radius: 10px;
-      background: #38bdf8;
-      color: #061322;
-      font-size: 12px;
-      font-weight: 800;
+      font-weight: 600;
+      padding: 6px 4px;
+      border-radius: 12px;
       cursor: pointer;
-      font-variant-numeric: tabular-nums;
     }
 
-    .upg-btn:disabled {
-      background: rgba(51, 65, 85, 0.7);
-      color: #94a3b8;
-      cursor: not-allowed;
+    .nav-btn span.icon {
+      font-size: 18px;
+    }
+
+    .nav-btn.active {
+      color: var(--accent);
+      background: rgba(255, 158, 68, 0.1);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 360px;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 158, 68, 0.35);
+      border-radius: 22px;
+      padding: 22px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: #2b243d;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 60;
+      transition: transform 0.25s ease;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
     }
   </style>
 </head>
 <body>
+  <div class="toast" id="toast"></div>
+
+  <!-- Модальное окно оффлайн-заработка -->
+  <div class="modal-backdrop" id="offlineModal">
+    <div class="modal-card">
+      <div style="font-size: 46px;">💤🐾</div>
+      <h3>Котики работали без вас!</h3>
+      <p class="card-desc" id="offlineText">Вы отсутствовали 0 мин.</p>
+      <div style="font-size: 26px; font-weight: 800; color: var(--green);" id="offlineReward">+0 🐟</div>
+      <button class="btn btn-primary" id="claimOfflineBtn">Забрать рыбок</button>
+    </div>
+  </div>
+
   <div class="app">
-    <div class="top">
-      <div class="coins" id="coinsEl">0</div>
-      <div class="rates">
-        <div id="tapInfoEl">Удар: +1</div>
-        <div id="autoInfoEl">Авто: +0/с • Крит: 5%</div>
+    <!-- Шапка -->
+    <div class="top-bar">
+      <div class="user-info">
+        <div class="avatar">🐱</div>
+        <div>
+          <div class="user-name" id="userName">Котовод</div>
+          <div class="user-sub">Клик: <strong id="perTapLabel">+1</strong></div>
+        </div>
+      </div>
+      <div class="passive-badge" id="perSecLabel">+0/сек</div>
+    </div>
+
+    <!-- Баланс -->
+    <div class="balance-box">
+      <div class="balance-label">Баланс мяу-рыбок</div>
+      <div class="balance-value" id="balanceLabel">0</div>
+    </div>
+
+    <!-- Вкладка 1: Кликер -->
+    <div class="tab-content active" id="tab-clicker">
+      <div class="cat-stage" id="catStage">
+        <button class="cat-btn" id="catBtn" aria-label="Тапнуть котика">🐈</button>
+      </div>
+
+      <div class="energy-box">
+        <div class="energy-top">
+          <span>⚡ Энергия лапок</span>
+          <span><strong id="energyLabel">500</strong> / <span id="maxEnergyLabel">500</span></span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="energyBar"></div>
+        </div>
       </div>
     </div>
 
-    <div class="stage" id="stageEl">
-      <div class="orbit">
-        <div class="drone" id="drone1"></div>
-        <div class="drone" id="drone2"></div>
-        <button class="core-btn" id="coreBtn">УДАР</button>
+    <!-- Вкладка 2: Прокачки -->
+    <div class="tab-content" id="tab-upgrades" id="upgradesList"></div>
+
+    <!-- Вкладка 3: Ежедневный бонус -->
+    <div class="tab-content" id="tab-daily">
+      <div class="card card-col">
+        <div>
+          <div class="card-title">🎁 Ежедневный кото-бонус</div>
+          <div class="card-desc" id="dailyStatusText">Заходите каждый день, чтобы увеличивать награду</div>
+        </div>
+        <div class="days-grid" id="daysGrid"></div>
+        <button class="btn btn-primary" id="claimDailyBtn">Забрать бонус</button>
       </div>
-      <button class="surge-btn" id="surgeBtn">⚡ Перегруз x2 (готово)</button>
     </div>
 
-    <div class="shop">
-      <div class="upg">
+    <!-- Вкладка 4: Друзья / Рефералка -->
+    <div class="tab-content" id="tab-friends">
+      <div class="card card-col">
         <div>
-          <div class="upg-name">Сила удара</div>
-          <div class="upg-stat" id="statTap">Ур. 1 • +1 за клик</div>
+          <div class="card-title">🤝 Пригласи друзей в МяуTap</div>
+          <div class="card-desc">За каждого друга — бонус <strong>+250 🐟</strong> и доля от его успехов</div>
         </div>
-        <button class="upg-btn" id="buyTapBtn">15</button>
+        <div class="ref-box" id="refLinkBox"></div>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-primary" style="flex: 1;" id="copyRefBtn">Скопировать ссылку</button>
+          <button class="btn btn-secondary" id="simRefBtn">+1 друг (тест)</button>
+        </div>
       </div>
 
-      <div class="upg">
+      <div class="card">
         <div>
-          <div class="upg-name">Авто-дрон</div>
-          <div class="upg-stat" id="statAuto">Ур. 0 • +0/сек</div>
+          <div class="card-title">Приглашено друзей</div>
+          <div class="card-desc">Бонус за друзей: <strong id="refBonusEarned">0 🐟</strong></div>
         </div>
-        <button class="upg-btn" id="buyAutoBtn">35</button>
-      </div>
-
-      <div class="upg">
-        <div>
-          <div class="upg-name">Шанс крита</div>
-          <div class="upg-stat" id="statCrit">Ур. 0 • 5% (x3)</div>
-        </div>
-        <button class="upg-btn" id="buyCritBtn">50</button>
-      </div>
-
-      <div class="upg">
-        <div>
-          <div class="upg-name">Множитель ядра</div>
-          <div class="upg-stat" id="statMult">Ур. 1 • x1.0 бонус</div>
-        </div>
-        <button class="upg-btn" id="buyMultBtn">120</button>
+        <div style="font-size: 22px; font-weight: 800; color: var(--accent);" id="refCountLabel">0</div>
       </div>
     </div>
   </div>
 
+  <!-- Нижнее меню -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="clicker">
+      <span class="icon">🐾</span>
+      <span>Тап</span>
+    </button>
+    <button class="nav-btn" data-tab="upgrades">
+      <span class="icon">📈</span>
+      <span>Бусты</span>
+    </button>
+    <button class="nav-btn" data-tab="daily">
+      <span class="icon">🎁</span>
+      <span>Бонус</span>
+    </button>
+    <button class="nav-btn" data-tab="friends">
+      <span class="icon">👥</span>
+      <span>Друзья</span>
+    </button>
+  </nav>
+
   <script>
-    (function () {
-      const stageEl = document.getElementById('stageEl');
-      const coreBtn = document.getElementById('coreBtn');
-      const surgeBtn = document.getElementById('surgeBtn');
-      const drone1 = document.getElementById('drone1');
-      const drone2 = document.getElementById('drone2');
+    const BOT_USERNAME = "YourCatClickerBot"; // Замените на юзернейм вашего бота из @BotFather
+    const APP_SHORT_NAME = "meowtap";       // Замените на short_name вашего Mini App
+    const OFFLINE_CAP_SECONDS = 8 * 3600;   // Максимум 8 часов оффлайн-дохода
+    const DAILY_REWARDS = [100, 200, 350, 500, 800, 1200, 2500];
 
-      const coinsEl = document.getElementById('coinsEl');
-      const tapInfoEl = document.getElementById('tapInfoEl');
-      const autoInfoEl = document.getElementById('autoInfoEl');
+    const UPGRADE_DEFS = [
+      {
+        id: "claw",
+        icon: "🧶",
+        title: "Клубок ниток",
+        desc: "+1 к силе каждого тапа",
+        baseCost: 25,
+        costMult: 1.55,
+        tapAdd: 1,
+        incomeAdd: 0,
+        energyAdd: 0
+      },
+      {
+        id: "bowl",
+        icon: "🥣",
+        title: "Миска со сливками",
+        desc: "+3 к доходу в секунду",
+        baseCost: 60,
+        costMult: 1.6,
+        tapAdd: 0,
+        incomeAdd: 3,
+        energyAdd: 0
+      },
+      {
+        id: "pillow",
+        icon: "🛏️",
+        title: "Мягкая лежанка",
+        desc: "+150 к максимуму энергии",
+        baseCost: 100,
+        costMult: 1.5,
+        tapAdd: 0,
+        incomeAdd: 0,
+        energyAdd: 150
+      },
+      {
+        id: "cafe",
+        icon: "☕",
+        title: "Уютное кото-кафе",
+        desc: "+12 к доходу в секунду и +2 к тапу",
+        baseCost: 280,
+        costMult: 1.65,
+        tapAdd: 2,
+        incomeAdd: 12,
+        energyAdd: 0
+      },
+      {
+        id: "royal",
+        icon: "👑",
+        title: "Королевский трон кота",
+        desc: "+45 к доходу в секунду и +6 к тапу",
+        baseCost: 900,
+        costMult: 1.7,
+        tapAdd: 6,
+        incomeAdd: 45,
+        energyAdd: 250
+      }
+    ];
 
-      const statTap = document.getElementById('statTap');
-      const statAuto = document.getElementById('statAuto');
-      const statCrit = document.getElementById('statCrit');
-      const statMult = document.getElementById('statMult');
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
 
-      const buyTapBtn = document.getElementById('buyTapBtn');
-      const buyAutoBtn = document.getElementById('buyAutoBtn');
-      const buyCritBtn = document.getElementById('buyCritBtn');
-      const buyMultBtn = document.getElementById('buyMultBtn');
+    const defaultState = {
+      balance: 0,
+      energy: 500,
+      levels: {},
+      lastSeen: Date.now(),
+      lastDailyClaim: null,
+      dailyStreak: 0,
+      referrals: 0,
+      refBonusTotal: 0,
+      pendingOffline: 0
+    };
 
-      let coins = 0;
-      let tapLvl = 1;
-      let autoLvl = 0;
-      let critLvl = 0;
-      let multLvl = 1;
-
-      let overdriveLeft = 0;
-      let surgeCooldown = 0;
-      let droneAngle = 0;
-      let autoAcc = 0;
-      let lastTime = performance.now();
-
+    function loadState() {
       try {
-        const saved = JSON.parse(localStorage.getItem('core_upg_save') || 'null');
-        if (saved) {
-          coins = Number(saved.coins) || 0;
-          tapLvl = Math.max(1, Number(saved.tapLvl) || 1);
-          autoLvl = Math.max(0, Number(saved.autoLvl) || 0);
-          critLvl = Math.max(0, Number(saved.critLvl) || 0);
-          multLvl = Math.max(1, Number(saved.multLvl) || 1);
+        const raw = localStorage.getItem("meowtap_save_v1");
+        if (!raw) return { ...defaultState };
+        return { ...defaultState, ...JSON.parse(raw) };
+      } catch {
+        return { ...defaultState };
+      }
+    }
+
+    let state = loadState();
+
+    function saveState() {
+      state.lastSeen = Date.now();
+      localStorage.setItem("meowtap_save_v1", JSON.stringify(state));
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function haptic(style = "light") {
+      try {
+        if (tg && tg.HapticFeedback) {
+          tg.HapticFeedback.impactOccurred(style);
         }
-      } catch (e) {}
+      } catch {}
+    }
 
-      function saveGame() {
-        try {
-          localStorage.setItem('core_upg_save', JSON.stringify({
-            coins: Math.floor(coins),
-            tapLvl: tapLvl,
-            autoLvl: autoLvl,
-            critLvl: critLvl,
-            multLvl: multLvl
-          }));
-        } catch (e) {}
+    function getLevel(id) {
+      return state.levels[id] || 0;
+    }
+
+    function getUpgradeCost(def) {
+      return Math.floor(def.baseCost * Math.pow(def.costMult, getLevel(def.id)));
+    }
+
+    function getStats() {
+      let perTap = 1;
+      let perSec = 0;
+      let maxEnergy = 500;
+
+      for (const def of UPGRADE_DEFS) {
+        const lvl = getLevel(def.id);
+        perTap += lvl * def.tapAdd;
+        perSec += lvl * def.incomeAdd;
+        maxEnergy += lvl * def.energyAdd;
       }
 
-      function getTapBase() {
-        return tapLvl + Math.floor((tapLvl - 1) * (tapLvl - 1) * 0.6);
+      return { perTap, perSec, maxEnergy };
+    }
+
+    function formatNum(n) {
+      if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + "M";
+      if (n >= 1_000) return (n / 1_000).toFixed(1) + "K";
+      return Math.floor(n).toLocaleString("ru-RU");
+    }
+
+    function getUserId() {
+      const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+      if (tgUser) return String(tgUser.id);
+      let localId = localStorage.getItem("meowtap_user_id");
+      if (!localId) {
+        localId = String(Math.floor(100000 + Math.random() * 900000));
+        localStorage.setItem("meowtap_user_id", localId);
       }
-      function getTapCost() {
-        return Math.floor(15 * Math.pow(1.55, tapLvl - 1));
+      return localId;
+    }
+
+    function getRefLink() {
+      return `https://t.me/${BOT_USERNAME}/${APP_SHORT_NAME}?startapp=ref_${getUserId()}`;
+    }
+
+    function isSameDay(a, b) {
+      const da = new Date(a);
+      const db = new Date(b);
+      return (
+        da.getFullYear() === db.getFullYear() &&
+        da.getMonth() === db.getMonth() &&
+        da.getDate() === db.getDate()
+      );
+    }
+
+    function checkOfflineEarnings() {
+      const now = Date.now();
+      const elapsedSec = Math.max(0, Math.floor((now - state.lastSeen) / 1000));
+      const { perSec } = getStats();
+      const cappedSec = Math.min(elapsedSec, OFFLINE_CAP_SECONDS);
+      const earned = Math.floor(cappedSec * perSec);
+
+      if (earned > 0 && cappedSec >= 10) {
+        state.pendingOffline = earned;
+        const mins = Math.max(1, Math.floor(cappedSec / 60));
+        document.getElementById("offlineText").textContent =
+          `Вы отсутствовали ${mins} мин. (учитывается до 8 ч.)`;
+        document.getElementById("offlineReward").textContent = `+${formatNum(earned)} 🐟`;
+        document.getElementById("offlineModal").classList.add("open");
+      }
+    }
+
+    function renderUpgrades() {
+      const container = document.getElementById("tab-upgrades");
+      const { perTap } = getStats();
+      container.innerHTML = "";
+
+      for (const def of UPGRADE_DEFS) {
+        const lvl = getLevel(def.id);
+        const cost = getUpgradeCost(def);
+        const canAfford = state.balance >= cost;
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div>
+            <div class="card-title">${def.icon} ${def.title} <span style="color:var(--muted);font-weight:500;">(Ур. ${lvl})</span></div>
+            <div class="card-desc">${def.desc}</div>
+          </div>
+          <button class="btn btn-primary" ${canAfford ? "" : "disabled"} data-upgrade="${def.id}">
+            ${formatNum(cost)} 🐟
+          </button>
+        `;
+        container.appendChild(card);
       }
 
-      function getAutoBase() {
-        return autoLvl === 0 ? 0 : autoLvl * 2 + Math.floor(autoLvl * autoLvl * 0.5);
-      }
-      function getAutoCost() {
-        return Math.floor(35 * Math.pow(1.65, autoLvl));
-      }
+      container.querySelectorAll("[data-upgrade]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-upgrade");
+          const def = UPGRADE_DEFS.find((u) => u.id === id);
+          const cost = getUpgradeCost(def);
+          if (state.balance < cost) return;
 
-      function getCritChance() {
-        return Math.min(0.65, 0.05 + critLvl * 0.05);
-      }
-      function getCritCost() {
-        return Math.floor(50 * Math.pow(1.7, critLvl));
-      }
-
-      function getCoreMult() {
-        return 1 + (multLvl - 1) * 0.25;
-      }
-      function getMultCost() {
-        return Math.floor(120 * Math.pow(1.9, multLvl - 1));
-      }
-
-      function getActiveBoost() {
-        return overdriveLeft > 0 ? 2 : 1;
-      }
-
-      function spawnFloat(x, y, text, color) {
-        const el = document.createElement('div');
-        el.className = 'float-dmg';
-        el.textContent = text;
-        el.style.left = x + 'px';
-        el.style.top = y + 'px';
-        el.style.color = color || '#ffffff';
-        stageEl.appendChild(el);
-        setTimeout(function () {
-          if (el.parentNode) el.parentNode.removeChild(el);
-        }, 650);
-      }
-
-      function hitCore(clientX, clientY, isAuto) {
-        const boost = getActiveBoost();
-        const mult = getCoreMult();
-        const base = isAuto ? getAutoBase() : getTapBase();
-        if (base <= 0) return;
-
-        const isCrit = Math.random() < getCritChance();
-        const gained = Math.max(1, Math.round(base * mult * boost * (isCrit ? 3 : 1)));
-        coins += gained;
-
-        const rect = stageEl.getBoundingClientRect();
-        const px = typeof clientX === 'number'
-          ? clientX - rect.left + (Math.random() * 24 - 12)
-          : rect.width / 2 + (Math.random() * 70 - 35);
-        const py = typeof clientY === 'number'
-          ? clientY - rect.top - 10
-          : rect.height / 2 - 20 + (Math.random() * 40 - 20);
-
-        spawnFloat(
-          px,
-          py,
-          (isCrit ? 'CRIT +' : '+') + gained,
-          isCrit ? '#fde047' : (isAuto ? '#7dd3fc' : '#ffffff')
-        );
-        updateUI();
-      }
-
-      coreBtn.addEventListener('pointerdown', function (e) {
-        hitCore(e.clientX, e.clientY, false);
+          state.balance -= cost;
+          state.levels[id] = getLevel(id) + 1;
+          const statsAfter = getStats();
+          state.energy = Math.min(statsAfter.maxEnergy, state.energy + def.energyAdd);
+          haptic("medium");
+          showToast(`Прокачано: ${def.title}!`);
+          saveState();
+          renderAll();
+        });
       });
+    }
 
-      surgeBtn.addEventListener('click', function () {
-        if (overdriveLeft <= 0 && surgeCooldown <= 0) {
-          overdriveLeft = 7;
-          surgeCooldown = 22;
-          updateUI();
+    function renderDaily() {
+      const grid = document.getElementById("daysGrid");
+      const btn = document.getElementById("claimDailyBtn");
+      const statusText = document.getElementById("dailyStatusText");
+      const claimedToday = state.lastDailyClaim && isSameDay(state.lastDailyClaim, Date.now());
+      const activeDayIndex = claimedToday
+        ? Math.max(0, (state.dailyStreak - 1) % DAILY_REWARDS.length)
+        : state.dailyStreak % DAILY_REWARDS.length;
+
+      grid.innerHTML = "";
+      DAILY_REWARDS.forEach((reward, idx) => {
+        const el = document.createElement("div");
+        el.className = "day-item";
+        if (claimedToday && idx <= activeDayIndex) {
+          el.classList.add("claimed");
+        } else if (!claimedToday && idx === activeDayIndex) {
+          el.classList.add("current");
         }
+        el.innerHTML = `<div>День ${idx + 1}</div><strong>+${reward}</strong>`;
+        grid.appendChild(el);
       });
 
-      buyTapBtn.addEventListener('click', function () {
-        const c = getTapCost();
-        if (coins >= c) { coins -= c; tapLvl += 1; saveGame(); updateUI(); }
-      });
+      if (claimedToday) {
+        btn.disabled = true;
+        btn.textContent = "Уже получено сегодня";
+        statusText.textContent = "Возвращайтесь завтра за следующим бонусом!";
+      } else {
+        btn.disabled = false;
+        const nextReward = DAILY_REWARDS[state.dailyStreak % DAILY_REWARDS.length];
+        btn.textContent = `Забрать +${nextReward} 🐟`;
+        statusText.textContent = `Текущая серия дней: ${state.dailyStreak}`;
+      }
+    }
 
-      buyAutoBtn.addEventListener('click', function () {
-        const c = getAutoCost();
-        if (coins >= c) { coins -= c; autoLvl += 1; saveGame(); updateUI(); }
-      });
+    function renderFriends() {
+      document.getElementById("refLinkBox").textContent = getRefLink();
+      document.getElementById("refCountLabel").textContent = state.referrals;
+      document.getElementById("refBonusEarned").textContent = `${formatNum(state.refBonusTotal)} 🐟`;
+    }
 
-      buyCritBtn.addEventListener('click', function () {
-        const c = getCritCost();
-        if (coins >= c) { coins -= c; critLvl += 1; saveGame(); updateUI(); }
-      });
+    function renderAll() {
+      const { perTap, perSec, maxEnergy } = getStats();
+      state.energy = Math.min(state.energy, maxEnergy);
 
-      buyMultBtn.addEventListener('click', function () {
-        const c = getMultCost();
-        if (coins >= c) { coins -= c; multLvl += 1; saveGame(); updateUI(); }
-      });
-
-      function updateUI() {
-        const boost = getActiveBoost();
-        const mult = getCoreMult();
-        const effectiveTap = Math.round(getTapBase() * mult * boost);
-        const effectiveAuto = Math.round(getAutoBase() * mult * boost);
-
-        coinsEl.textContent = Math.floor(coins).toLocaleString('ru-RU');
-        tapInfoEl.textContent = 'Удар: +' + effectiveTap;
-        autoInfoEl.textContent = 'Авто: +' + effectiveAuto + '/с • Крит: ' + Math.round(getCritChance() * 100) + '%';
-
-        coreBtn.classList.toggle('overdrive', overdriveLeft > 0);
-        if (overdriveLeft > 0) {
-          surgeBtn.disabled = true;
-          surgeBtn.textContent = '🔥 ПЕРЕГРУЗ x2 (' + overdriveLeft.toFixed(1) + 'с)';
-        } else if (surgeCooldown > 0) {
-          surgeBtn.disabled = true;
-          surgeBtn.textContent = '⏳ Перезарядка (' + Math.ceil(surgeCooldown) + 'с)';
-        } else {
-          surgeBtn.disabled = false;
-          surgeBtn.textContent = '⚡ Перегруз x2 (7с)';
-        }
-
-        drone1.style.display = autoLvl >= 1 ? 'block' : 'none';
-        drone2.style.display = autoLvl >= 4 ? 'block' : 'none';
-
-        const cTap = getTapCost();
-        statTap.textContent = 'Ур. ' + tapLvl + ' • база +' + getTapBase();
-        buyTapBtn.textContent = 'Качнуть • ' + cTap;
-        buyTapBtn.disabled = coins < cTap;
-
-        const cAuto = getAutoCost();
-        statAuto.textContent = 'Ур. ' + autoLvl + ' • база +' + getAutoBase() + '/с';
-        buyAutoBtn.textContent = 'Качнуть • ' + cAuto;
-        buyAutoBtn.disabled = coins < cAuto;
-
-        const cCrit = getCritCost();
-        statCrit.textContent = 'Ур. ' + critLvl + ' • ' + Math.round(getCritChance() * 100) + '% (x3)';
-        buyCritBtn.textContent = 'Качнуть • ' + cCrit;
-        buyCritBtn.disabled = coins < cCrit;
-
-        const cMult = getMultCost();
-        statMult.textContent = 'Ур. ' + multLvl + ' • x' + mult.toFixed(2) + ' бонус';
-        buyMultBtn.textContent = 'Качнуть • ' + cMult;
-        buyMultBtn.disabled = coins < cMult;
+      const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+      if (tgUser && tgUser.first_name) {
+        document.getElementById("userName").textContent = tgUser.first_name;
       }
 
-      function tick(now) {
-        const dt = Math.min(0.1, (now - lastTime) / 1000);
-        lastTime = now;
+      document.getElementById("balanceLabel").textContent = formatNum(state.balance);
+      document.getElementById("perTapLabel").textContent = `+${formatNum(perTap)}`;
+      document.getElementById("perSecLabel").textContent = `+${formatNum(perSec)}/сек`;
+      document.getElementById("energyLabel").textContent = Math.floor(state.energy);
+      document.getElementById("maxEnergyLabel").textContent = maxEnergy;
+      document.getElementById("energyBar").style.width = `${Math.max(0, (state.energy / maxEnergy) * 100)}%`;
 
-        if (overdriveLeft > 0) overdriveLeft = Math.max(0, overdriveLeft - dt);
-        if (surgeCooldown > 0) surgeCooldown = Math.max(0, surgeCooldown - dt);
+      renderUpgrades();
+      renderDaily();
+      renderFriends();
+    }
 
-        if (autoLvl >= 1) {
-          droneAngle += dt * (overdriveLeft > 0 ? 4.2 : 2.1);
-          const r = 92;
-          const cx = 105 - 11;
-          const cy = 105 - 11;
-          drone1.style.left = (cx + Math.cos(droneAngle) * r) + 'px';
-          drone1.style.top = (cy + Math.sin(droneAngle) * r) + 'px';
+    function spawnFloatingNumber(x, y, amount) {
+      const stage = document.getElementById("catStage");
+      const rect = stage.getBoundingClientRect();
+      const el = document.createElement("div");
+      el.className = "floating-text";
+      el.textContent = `+${amount}`;
+      el.style.left = `${x - rect.left}px`;
+      el.style.top = `${y - rect.top}px`;
+      stage.appendChild(el);
+      setTimeout(() => el.remove(), 850);
+    }
 
-          if (autoLvl >= 4) {
-            drone2.style.left = (cx + Math.cos(droneAngle + Math.PI) * r) + 'px';
-            drone2.style.top = (cy + Math.sin(droneAngle + Math.PI) * r) + 'px';
-          }
-
-          autoAcc += dt;
-          if (autoAcc >= 1) {
-            autoAcc -= 1;
-            hitCore(undefined, undefined, true);
-          }
-        }
-
-        updateUI();
-        requestAnimationFrame(tick);
+    document.getElementById("catBtn").addEventListener("pointerdown", (e) => {
+      const { perTap } = getStats();
+      if (state.energy < 1) {
+        showToast("Лапки устали! Подождите восстановления энергии");
+        return;
       }
+      const gain = Math.min(perTap, Math.floor(state.energy));
+      state.balance += gain;
+      state.energy = Math.max(0, state.energy - 1);
+      haptic("light");
+      spawnFloatingNumber(e.clientX, e.clientY, gain);
+      saveState();
+      renderAll();
+    });
 
-      setInterval(saveGame, 2500);
-      updateUI();
-      requestAnimationFrame(tick);
-    })();
+    document.getElementById("claimOfflineBtn").addEventListener("click", () => {
+      state.balance += state.pendingOffline;
+      state.pendingOffline = 0;
+      document.getElementById("offlineModal").classList.remove("open");
+      haptic("medium");
+      saveState();
+      renderAll();
+    });
+
+    document.getElementById("claimDailyBtn").addEventListener("click", () => {
+      if (state.lastDailyClaim && isSameDay(state.lastDailyClaim, Date.now())) return;
+      const reward = DAILY_REWARDS[state.dailyStreak % DAILY_REWARDS.length];
+      state.balance += reward;
+      state.dailyStreak += 1;
+      state.lastDailyClaim = Date.now();
+      haptic("heavy");
+      showToast(`Получен ежедневный бонус +${reward} 🐟!`);
+      saveState();
+      renderAll();
+    });
+
+    document.getElementById("copyRefBtn").addEventListener("click", async () => {
+      const link = getRefLink();
+      try {
+        await navigator.clipboard.writeText(link);
+        showToast("Реферальная ссылка скопирована!");
+      } catch {
+        showToast("Скопируйте ссылку из поля выше");
+      }
+    });
+
+    document.getElementById("simRefBtn").addEventListener("click", () => {
+      const bonus = 250;
+      state.referrals += 1;
+      state.refBonusTotal += bonus;
+      state.balance += bonus;
+      haptic("medium");
+      showToast(`Друг присоединился! +${bonus} 🐟`);
+      saveState();
+      renderAll();
+    });
+
+    document.querySelectorAll(".nav-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tab = btn.getAttribute("data-tab");
+        document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(`tab-${tab}`).classList.add("active");
+      });
+    });
+
+    // Пассивный доход и восстановление энергии каждую секунду
+    setInterval(() => {
+      const { perSec, maxEnergy } = getStats();
+      state.balance += perSec;
+      state.energy = Math.min(maxEnergy, state.energy + 2);
+      saveState();
+      renderAll();
+    }, 1000);
+
+    checkOfflineEarnings();
+    renderAll();
   </script>
 </body>
 </html>
