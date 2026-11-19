@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clicker Mini App v1.6</title>
+    <title>Clicker Mini App v1.8</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -30,7 +30,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
+            padding: 14px 18px;
             background: rgba(0, 0, 0, 0.25);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -63,6 +63,7 @@
             position: relative;
             padding: 15px;
             overflow-y: auto;
+            padding-bottom: 24px;
         }
 
         /* Вкладки */
@@ -88,24 +89,34 @@
         }
 
         .score-label {
-            font-size: 16px;
+            font-size: 15px;
             text-transform: uppercase;
             letter-spacing: 2px;
             opacity: 0.85;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .score-value {
-            font-size: 52px;
+            font-size: 50px;
             font-weight: 800;
             text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            margin-bottom: 40px;
+            margin-bottom: 6px;
+        }
+
+        .passive-badge {
+            font-size: 13px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 4px 12px;
+            border-radius: 999px;
+            margin-bottom: 28px;
+            color: #ffe599;
+            font-weight: 600;
         }
 
         /* Главная кнопка кликера */
         .click-btn {
-            width: 220px;
-            height: 220px;
+            width: 215px;
+            height: 215px;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7 60%, #0369a1 100%);
             border: 6px solid rgba(255, 255, 255, 0.3);
@@ -113,7 +124,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 110px;
+            font-size: 105px;
             cursor: pointer;
             transition: transform 0.08s ease, box-shadow 0.08s ease;
             position: relative;
@@ -133,6 +144,7 @@
             pointer-events: none;
             animation: floatUp 0.8s ease-out forwards;
             text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            z-index: 50;
         }
 
         @keyframes floatUp {
@@ -140,21 +152,21 @@
             100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
         }
 
-        /* Карточки в магазине */
+        /* Карточки */
         .card-box {
             background: rgba(0, 0, 0, 0.35);
             backdrop-filter: blur(10px);
             padding: 18px;
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 340px;
+            max-width: 360px;
             width: 100%;
             text-align: center;
         }
 
         .card-box h2 {
             font-size: 20px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .upgrade-card {
@@ -176,7 +188,7 @@
 
         .upgrade-desc {
             font-size: 11px;
-            opacity: 0.8;
+            opacity: 0.85;
         }
 
         .upgrade-btn {
@@ -198,9 +210,100 @@
         }
 
         .upgrade-btn:disabled {
-            background: rgba(255, 255, 255, 0.3);
-            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.55);
             cursor: not-allowed;
+        }
+
+        /* Ежедневная награда */
+        .daily-card {
+            background: rgba(255, 209, 102, 0.14);
+            border: 1px solid rgba(255, 209, 102, 0.4);
+            border-radius: 18px;
+            padding: 14px;
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        .daily-title {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .daily-desc {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .daily-btn {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 12px;
+            background: #22c55e;
+            color: #06180d;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .daily-btn:disabled {
+            background: rgba(255, 255, 255, 0.22);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: not-allowed;
+        }
+
+        /* Реферальный блок */
+        .ref-link-box {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px dashed rgba(255, 255, 255, 0.35);
+            border-radius: 14px;
+            padding: 10px;
+            font-size: 12px;
+            word-break: break-all;
+            margin: 10px 0;
+            color: #fff;
+        }
+
+        .ref-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .secondary-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .primary-share-btn {
+            flex: 1.4;
+            background: #22c55e;
+            color: #081b10;
+            border: none;
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .ref-stats {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 14px;
+            padding: 10px;
+            font-size: 13px;
+            line-height: 1.5;
+            text-align: left;
         }
 
         /* Нижняя панель навигации */
@@ -209,7 +312,7 @@
             justify-content: space-around;
             background: rgba(0, 0, 0, 0.45);
             backdrop-filter: blur(12px);
-            padding: 12px 10px 22px 10px;
+            padding: 10px 6px 20px 6px;
             border-top: 1px solid rgba(255, 255, 255, 0.15);
         }
 
@@ -220,11 +323,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            font-size: 13px;
+            gap: 3px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            padding: 6px 16px;
+            padding: 6px 10px;
             border-radius: 14px;
             transition: all 0.2s;
         }
@@ -235,7 +338,7 @@
         }
 
         .nav-icon {
-            font-size: 22px;
+            font-size: 20px;
         }
 
         /* Окно регистрации */
@@ -324,12 +427,12 @@
 
     <!-- Центральная часть -->
     <div class="main-content">
-        
+
         <!-- Вкладка 1: Прокачка -->
         <div class="tab-screen" id="tab-upgrade">
             <div class="card-box">
                 <h2>🤑 Магазин улучшений</h2>
-                
+
                 <!-- 1. Прокачка силы тапа -->
                 <div class="upgrade-card">
                     <div class="upgrade-title" id="tapTitle">Сила тапа: +1</div>
@@ -350,24 +453,76 @@
                     <div class="upgrade-desc" id="regenDesc">Ускорить прибавление энергии</div>
                     <button class="upgrade-btn" id="regenBtn" onclick="buyRegenUpgrade()">Купить</button>
                 </div>
+
+                <!-- 4. Пассивный доход -->
+                <div class="upgrade-card">
+                    <div class="upgrade-title" id="passiveTitle">Пассивный доход: +0/сек</div>
+                    <div class="upgrade-desc" id="passiveDesc">Монеты капают каждую секунду</div>
+                    <button class="upgrade-btn" id="passiveBtn" onclick="buyPassiveUpgrade()">Купить</button>
+                </div>
+
+                <!-- 5. Быстрый заряд энергии -->
+                <div class="upgrade-card">
+                    <div class="upgrade-title">⚡ Полный заряд батареи</div>
+                    <div class="upgrade-desc" id="refillDesc">Мгновенно восполняет энергию до максимума</div>
+                    <button class="upgrade-btn" id="refillBtn" onclick="buyEnergyRefill()">Восстановить</button>
+                </div>
             </div>
         </div>
 
         <!-- Вкладка 2: Кликер (Главная) -->
         <div class="tab-screen active clicker-container" id="tab-clicker">
-            <div class="score-label">Количество тапов</div>
+            <div class="score-label">Баланс монет</div>
             <div class="score-value" id="displayScore">0</div>
-            
+            <div class="passive-badge" id="passiveBadge">Доход: +0/сек • Тап: +1</div>
+
             <div class="click-btn" id="clickBtn">
                 😗
             </div>
         </div>
 
-        <!-- Вкладка 3: Новости -->
+        <!-- Вкладка 3: Друзья / Рефералы -->
+        <div class="tab-screen" id="tab-friends">
+            <div class="card-box">
+                <h2>👥 Пригласи друзей</h2>
+                <p style="font-size: 13px; opacity: 0.92; line-height: 1.45;">
+                    За переход по ссылке — <b>+1 000 🪙</b><br>
+                    Бонус от дохода рефералов — <b>5%</b>
+                </p>
+
+                <div class="ref-link-box" id="refLinkText">Загрузка ссылки...</div>
+
+                <div class="ref-actions">
+                    <button class="secondary-btn" onclick="copyRefLink()">📋 Копировать</button>
+                    <button class="primary-share-btn" onclick="shareRefLink()">🚀 Поделиться</button>
+                </div>
+
+                <div class="ref-stats">
+                    <div>Твой ID: <b id="myRefId">—</b></div>
+                    <div>Приглашено друзей (локально): <b id="refCountDisplay">0</b></div>
+                    <div>5% от твоего дохода/сек: <b id="fivePercentIncome">0.00 / сек</b></div>
+                    <div id="invitedByText" style="color: #ffd166; margin-top: 6px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка 4: Ежедневные награды и новости -->
         <div class="tab-screen" id="tab-news">
             <div class="card-box">
+                <h2>🎁 Ежедневная награда</h2>
+                <div class="daily-card">
+                    <div class="daily-title">Бонус каждые 23 часа: +500 🪙</div>
+                    <div class="daily-desc" id="dailyStatusText">Проверяем доступность награды...</div>
+                    <button class="daily-btn" id="claimDailyBtn" onclick="claimDailyReward()">Забрать +500 🪙</button>
+                </div>
+
                 <h2>📢 Новости</h2>
-                <p><b>Версия 1.6 (Новый баланс)</b><br>Обновлены точные цены и уровни для энергии и притока в секунду!</p>
+                <p style="text-align: left; font-size: 13px; line-height: 1.5;">
+                    <b>Версия 1.8</b><br>
+                    • Бонус за переход по реферальной ссылке увеличен до +1 000 🪙.<br>
+                    • Добавлен расчёт и логика 5% от дохода.<br>
+                    • Добавлена ежедневная награда +500 🪙 каждые 23 часа.
+                </p>
             </div>
         </div>
 
@@ -383,19 +538,43 @@
             <span class="nav-icon">👇</span>
             <span>Кликер</span>
         </button>
+        <button class="nav-btn" onclick="switchTab('friends', this)">
+            <span class="nav-icon">👥</span>
+            <span>Друзья</span>
+        </button>
         <button class="nav-btn" onclick="switchTab('news', this)">
-            <span class="nav-icon">📢</span>
-            <span>Новости</span>
+            <span class="nav-icon">🎁</span>
+            <span>Бонусы</span>
         </button>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        // Укажите юзернейм вашего бота без @
+        const BOT_USERNAME = 'ВАШ_БОТ';
+        const REF_BONUS = 1000;
+        const REF_INCOME_SHARE = 0.05; // 5% от дохода
+        const DAILY_REWARD = 500;
+        const DAILY_COOLDOWN_MS = 23 * 60 * 60 * 1000; // 23 часа
+        const REFILL_COST = 300;
+
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        // Уникальный ID игрока (из Telegram или сгенерированный локально)
+        let playerId = localStorage.getItem('clicker_playerId');
+        if (!playerId) {
+            playerId = tg?.initDataUnsafe?.user?.id
+                ? String(tg.initDataUnsafe.user.id)
+                : 'u_' + Math.random().toString(36).substring(2, 9);
+            localStorage.setItem('clicker_playerId', playerId);
+        }
 
         let score = parseInt(localStorage.getItem('clicker_score')) || 0;
-        let username = localStorage.getItem('clicker_username') || '';
-        
+        let username = localStorage.getItem('clicker_username') || tg?.initDataUnsafe?.user?.first_name || '';
+
         let tapPower = parseInt(localStorage.getItem('clicker_tapPower')) || 1;
         let tapLevel = parseInt(localStorage.getItem('clicker_tapLevel')) || 0;
 
@@ -405,232 +584,23 @@
         let regenRate = parseInt(localStorage.getItem('clicker_regenRate')) || 1;
         let regenLevel = parseInt(localStorage.getItem('clicker_regenLevel')) || 0;
 
-        let energy = localStorage.getItem('clicker_energy') !== null ? parseInt(localStorage.getItem('clicker_energy')) : maxEnergy;
+        let passiveIncome = parseInt(localStorage.getItem('clicker_passiveIncome')) || 0;
+        let passiveLevel = parseInt(localStorage.getItem('clicker_passiveLevel')) || 0;
 
-        // Офлайн восстановление
-        let lastSavedTime = localStorage.getItem('lastExitTime');
-        if (lastSavedTime) {
-            let elapsedMs = Date.now() - Number(lastSavedTime);
-            let elapsedSeconds = Math.floor(elapsedMs / 1000);
-            let restoredEnergy = Math.floor(elapsedSeconds * regenRate);
-            if (restoredEnergy > 0) {
-                energy = Math.min(maxEnergy, energy + restoredEnergy);
-            }
-        }
+        // Реферальные данные и 5% доход
+        let refCount = parseInt(localStorage.getItem('clicker_refCount')) || 0;
+        let invitedBy = localStorage.getItem('clicker_invitedBy') || '';
+        let refBonusClaimed = localStorage.getItem('clicker_refBonusClaimed') === 'true';
+        let refEarnedFromIncome = parseFloat(localStorage.getItem('clicker_refEarnedFromIncome')) || 0;
 
-        window.addEventListener('beforeunload', () => {
-            localStorage.setItem('lastExitTime', Date.now());
-            saveGameData();
-        });
+        // Ежедневная награда (раз в 23 часа)
+        let lastDailyClaim = parseInt(localStorage.getItem('clicker_lastDailyClaim')) || 0;
 
-        setInterval(() => {
-            localStorage.setItem('lastExitTime', Date.now());
-            saveGameData();
-        }, 3000);
+        let energy = localStorage.getItem('clicker_energy') !== null
+            ? parseInt(localStorage.getItem('clicker_energy'))
+            : maxEnergy;
 
-        const displayScore = document.getElementById('displayScore');
-        const displayEnergy = document.getElementById('displayEnergy');
-        const displayMaxEnergy = document.getElementById('displayMaxEnergy');
-        const displayUsername = document.getElementById('displayUsername');
-        const regModal = document.getElementById('regModal');
-        const clickBtn = document.getElementById('clickBtn');
-
-        const tapTitle = document.getElementById('tapTitle');
-        const tapDesc = document.getElementById('tapDesc');
-        const tapUpgradeBtn = document.getElementById('tapUpgradeBtn');
-
-        const energyCapTitle = document.getElementById('energyCapTitle');
-        const energyCapDesc = document.getElementById('energyCapDesc');
-        const energyCapBtn = document.getElementById('energyCapBtn');
-
-        const regenTitle = document.getElementById('regenTitle');
-        const regenDesc = document.getElementById('regenDesc');
-        const regenBtn = document.getElementById('regenBtn');
-
-        if (!username) {
-            regModal.style.display = 'flex';
-        } else {
-            displayUsername.textContent = username;
-        }
-
-        function saveUsername() {
-            const input = document.getElementById('usernameInput').value.trim();
-            if (input.length > 0) {
-                username = input;
-                localStorage.setItem('clicker_username', username);
-                displayUsername.textContent = username;
-                regModal.style.display = 'none';
-            } else {
-                alert('Пожалуйста, введи имя!');
-            }
-        }
-
-        function saveGameData() {
-            localStorage.setItem('clicker_score', score);
-            localStorage.setItem('clicker_energy', energy);
-            localStorage.setItem('clicker_maxEnergy', maxEnergy);
-            localStorage.setItem('clicker_tapPower', tapPower);
-            localStorage.setItem('clicker_tapLevel', tapLevel);
-            localStorage.setItem('clicker_energyCapLevel', energyCapLevel);
-            localStorage.setItem('clicker_regenRate', regenRate);
-            localStorage.setItem('clicker_regenLevel', regenLevel);
-        }
-
-        // Обновление интерфейса по твоим точным правилам
-        function updateUI() {
-            displayScore.textContent = score.toLocaleString('ru-RU');
-            displayEnergy.textContent = energy;
-            displayMaxEnergy.textContent = maxEnergy;
-            saveGameData();
-
-            // 1. Сила тапа
-            if (tapLevel === 0) {
-                tapTitle.textContent = "Сила тапа: +1";
-                tapDesc.textContent = "Цена: 100 🪙 (Даёт +2)";
-                tapUpgradeBtn.textContent = "Купить за 100";
-                tapUpgradeBtn.disabled = score < 100;
-            } else if (tapLevel === 1) {
-                tapTitle.textContent = "Сила тапа: +2";
-                tapDesc.textContent = "Цена: 1 000 🪙 (Даёт +5)";
-                tapUpgradeBtn.textContent = "Купить за 1 000";
-                tapUpgradeBtn.disabled = score < 1000;
-            } else if (tapLevel === 2) {
-                tapTitle.textContent = "Сила тапа: +5";
-                tapDesc.textContent = "Цена: 5 000 🪙 (Даёт +10)";
-                tapUpgradeBtn.textContent = "Купить за 5 000";
-                tapUpgradeBtn.disabled = score < 5000;
-            } else {
-                tapTitle.textContent = "Сила тапа: +10 (МАКС)";
-                tapDesc.textContent = "Предел силы достигнут";
-                tapUpgradeBtn.textContent = "Максимум 🎉";
-                tapUpgradeBtn.disabled = true;
-            }
-
-            // 2. Емкость энергии по твоим ценам и объемам
-            if (energyCapLevel === 0) {
-                energyCapTitle.textContent = "Емкость: 5 000 ➔ 10 000";
-                energyCapDesc.textContent = "Цена: 1 000 🪙";
-                energyCapBtn.textContent = "Купить за 1 000";
-                energyCapBtn.disabled = score < 1000;
-            } else if (energyCapLevel === 1) {
-                energyCapTitle.textContent = "Емкость: 10 000 ➔ 25 000";
-                energyCapDesc.textContent = "Цена: 5 000 🪙";
-                energyCapBtn.textContent = "Купить за 5 000";
-                energyCapBtn.disabled = score < 5000;
-            } else if (energyCapLevel === 2) {
-                energyCapTitle.textContent = "Емкость: 25 000 ➔ 50 000";
-                energyCapDesc.textContent = "Цена: 10 000 🪙";
-                energyCapBtn.textContent = "Купить за 10 000";
-                energyCapBtn.disabled = score < 10000;
-            } else {
-                energyCapTitle.textContent = "Емкость: 50 000 (МАКС)";
-                energyCapDesc.textContent = "Максимальный запас батареи";
-                energyCapBtn.textContent = "Максимум 🎉";
-                energyCapBtn.disabled = true;
-            }
-
-            // 3. Приток энергии в секунду по твоим шагам
-            if (regenLevel === 0) {
-                regenTitle.textContent = "Приток: +1 ➔ +2 /сек";
-                regenDesc.textContent = "Цена: 500 🪙";
-                regenBtn.textContent = "Купить за 500";
-                regenBtn.disabled = score < 500;
-            } else if (regenLevel === 1) {
-                regenTitle.textContent = "Приток: +2 ➔ +3 /сек";
-                regenDesc.textContent = "Цена: 2 000 🪙";
-                regenBtn.textContent = "Купить за 2 000";
-                regenBtn.disabled = score < 2000;
-            } else if (regenLevel === 2) {
-                regenTitle.textContent = "Приток: +3 ➔ +4 /сек";
-                regenDesc.textContent = "Цена: 5 000 🪙";
-                regenBtn.textContent = "Купить за 5 000";
-                regenBtn.disabled = score < 5000;
-            } else if (regenLevel === 3) {
-                regenTitle.textContent = "Приток: +4 ➔ +5 /сек";
-                regenDesc.textContent = "Цена: 10 000 🪙";
-                regenBtn.textContent = "Купить за 10 000";
-                regenBtn.disabled = score < 10000;
-            } else {
-                regenTitle.textContent = "Приток: +5 /сек (МАКС)";
-                regenDesc.textContent = "Максимальная скорость притока";
-                regenBtn.textContent = "Максимум 🎉";
-                regenBtn.disabled = true;
-            }
-        }
-
-        // Покупка силы
-        function buyTapUpgrade() {
-            if (tapLevel === 0 && score >= 100) { score -= 100; tapPower = 2; tapLevel = 1; }
-            else if (tapLevel === 1 && score >= 1000) { score -= 1000; tapPower = 5; tapLevel = 2; }
-            else if (tapLevel === 2 && score >= 5000) { score -= 5000; tapPower = 10; tapLevel = 3; }
-            updateUI();
-        }
-
-        // Покупка емкости по новой сетке
-        function buyEnergyCapUpgrade() {
-            if (energyCapLevel === 0 && score >= 1000) {
-                score -= 1000; maxEnergy = 10000; energyCapLevel = 1; energy = Math.min(energy, maxEnergy);
-            } else if (energyCapLevel === 1 && score >= 5000) {
-                score -= 5000; maxEnergy = 25000; energyCapLevel = 2; energy = Math.min(energy, maxEnergy);
-            } else if (energyCapLevel === 2 && score >= 10000) {
-                score -= 10000; maxEnergy = 50000; energyCapLevel = 3; energy = Math.min(energy, maxEnergy);
-            }
-            updateUI();
-        }
-
-        // Покупка притока по новой сетке
-        function buyRegenUpgrade() {
-            if (regenLevel === 0 && score >= 500) { score -= 500; regenRate = 2; regenLevel = 1; }
-            else if (regenLevel === 1 && score >= 2000) { score -= 2000; regenRate = 3; regenLevel = 2; }
-            else if (regenLevel === 2 && score >= 5000) { score -= 5000; regenRate = 4; regenLevel = 3; }
-            else if (regenLevel === 3 && score >= 10000) { score -= 10000; regenRate = 5; regenLevel = 4; }
-            updateUI();
-        }
-
-        clickBtn.addEventListener('pointerdown', (e) => {
-            if (energy >= tapPower) {
-                score += tapPower;
-                energy -= tapPower;
-                updateUI();
-
-                if (tg.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('medium');
-                }
-
-                createFloatingText(e.clientX, e.clientY, `+${tapPower}`);
-            }
-        });
-
-        function createFloatingText(x, y, text) {
-            const plus = document.createElement('div');
-            plus.className = 'floating-plus';
-            plus.textContent = text;
-            plus.style.left = `${x - 15}px`;
-            plus.style.top = `${y - 30}px`;
-            document.body.appendChild(plus);
-
-            setTimeout(() => {
-                plus.remove();
-            }, 800);
-        }
-
-        // Авто-приток энергии каждую секунду
-        setInterval(() => {
-            if (energy < maxEnergy) {
-                energy = Math.min(maxEnergy, energy + regenRate);
-                updateUI();
-            }
-        }, 1000);
-
-        function switchTab(tabName, btnElement) {
-            document.querySelectorAll('.tab-screen').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-
-            document.getElementById('tab-' + tabName).classList.add('active');
-            btnElement.classList.add('active');
-        }
-
-        updateUI();
-    </script>
-</body>
-</html>
+        // Вызывается при получении дохода игроком (для будущей отправки 5% пригласившему на бэкенде)
+        function onPlayerIncomeGain(amount) {
+            if (!amount || amount <= 0) return;
+            const fivePercent = amount * REF_INCOME_SHAR
