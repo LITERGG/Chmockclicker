@@ -9,7 +9,6 @@
     :root {
       --bg: #121018;
       --bg-card: #1d1928;
-      --bg-card-hover: #262134;
       --accent: #ff9e44;
       --accent-2: #ff6b8b;
       --green: #4ade80;
@@ -258,11 +257,6 @@
     .btn-primary:disabled {
       opacity: 0.4;
       cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.09);
-      color: var(--text);
     }
 
     .days-grid {
@@ -642,6 +636,13 @@
       return Math.floor(n).toLocaleString("ru-RU");
     }
 
+    function formatDuration(seconds) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      if (hrs > 0) return `${hrs} ч ${mins} мин`;
+      return `${Math.max(1, mins)} мин`;
+    }
+
     function getUserId() {
       const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
       if (tgUser) return String(tgUser.id);
@@ -669,19 +670,21 @@
 
     function checkOfflineEarnings() {
       const now = Date.now();
-      const elapsedSec = Math.max(0, Math.floor((now - state.lastSeen) / 1000));
+      const previousSeen = Number(state.lastSeen) || now;
+      const elapsedSec = Math.max(0, Math.floor((now - previousSeen) / 1000));
       const { perSec } = getStats();
       const cappedSec = Math.min(elapsedSec, OFFLINE_CAP_SECONDS);
       const earned = Math.floor(cappedSec * perSec);
 
-      if (earned > 0 && cappedSec >= 10) {
+      if (earned > 0 && cappedSec >= 5) {
         state.pendingOffline = earned;
-        const mins = Math.max(1, Math.floor(cappedSec / 60));
         document.getElementById("offlineText").textContent =
-          `Вы отсутствовали ${mins} мин. (учитывается до 8 ч.)`;
+          `Вы отсутствовали ${formatDuration(cappedSec)} (лимит — до 8 ч)`;
         document.getElementById("offlineReward").textContent = `+${formatNum(earned)} 🐟`;
         document.getElementById("offlineModal").classList.add("open");
       }
+
+      saveState();
     }
 
     function renderUpgrades() {
@@ -853,6 +856,15 @@
         btn.classList.add("active");
         document.getElementById(`tab-${tab}`).classList.add("active");
       });
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        saveState();
+      } else {
+        checkOfflineEarnings();
+        renderAll();
+      }
     });
 
     // Пассивный доход и восстановление энергии каждую секунду
